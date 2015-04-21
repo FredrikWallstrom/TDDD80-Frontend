@@ -40,6 +40,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -66,7 +67,6 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
     private View mProgressView;
     private View mLoginFormView;
 
-    private String mUrl = "http://10.0.2.2:3548/get_user/";
     private final static String USER_TAG = "user";
     private final static String PASSWORD_TAG = "password";
 
@@ -364,7 +364,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
         String result;
         try {
             DefaultHttpClient httpClient = new DefaultHttpClient();
-            HttpGet httpget = new HttpGet(mUrl + username);
+            HttpGet httpget = new HttpGet(MainActivity.URL + "/get_user/" + username);
             HttpResponse response;
             response = httpClient.execute(httpget);
 

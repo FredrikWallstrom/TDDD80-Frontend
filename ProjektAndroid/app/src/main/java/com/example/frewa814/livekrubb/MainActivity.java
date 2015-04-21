@@ -9,6 +9,7 @@ import android.widget.SearchView;
 
 public class MainActivity extends Activity {
 
+    public final static String URL = "http://livekrubb-frewa814.openshift.ida.liu.se";
     private MenuItem mMenuItem;
 
     @Override

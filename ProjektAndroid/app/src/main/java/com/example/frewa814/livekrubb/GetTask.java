@@ -17,7 +17,7 @@ import java.io.InputStreamReader;
 /**
  * Created by Fredrik on 2015-04-15.
  */
-public class GetUserTask extends AsyncTask<String, Void, String> {
+public class GetTask extends AsyncTask<String, Void, String> {
 
     @Override
     protected String doInBackground(String... params) {

@@ -37,8 +37,6 @@ public class FlowListAdapter extends BaseAdapter {
     ArrayList myList = new ArrayList();
     LayoutInflater inflater;
     Context context;
-    private String mUrlLike = "http://10.0.2.2:3548/like_post";
-    private String mUrlGetLikedPostsByID = "http://10.0.2.2:3548/all_likes_on_post/";
     private String mActivatedPerson = ActivatedPerson.activatedUsername;
 
     public FlowListAdapter(Context context, ArrayList myList) {
@@ -128,16 +126,24 @@ public class FlowListAdapter extends BaseAdapter {
         mViewHolder.likeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 View parentRow = (View) v.getParent();
                 ListView listView = (ListView) parentRow.getParent();
                 int position = listView.getPositionForView(parentRow);
                 try {
                     JSONObject likedPost = (JSONObject) FlowFragment.posts.get(position);
                     String postId = likedPost.getString("id");
-                    GetPostTask postTask = new GetPostTask(postId, mActivatedPerson);
-                    postTask.execute((Void) null);
-                } catch (JSONException e) {
+                    MakeLikeTask postTask = new MakeLikeTask(postId, mActivatedPerson);
+                    String result = postTask.execute((Void) null).get();
+
+                    if (result.equals("un_liked")) {
+                        mViewHolder.likeButton.setText("Like");
+                        // TODO Uppdatera display likesview här
+                    }
+                    else{
+                        mViewHolder.likeButton.setText("Unlike");
+                        // TODO Uppdatera display likesview här
+                    }
+                } catch (InterruptedException | ExecutionException | JSONException e) {
                     e.printStackTrace();
                 }
             }
@@ -153,7 +159,7 @@ public class FlowListAdapter extends BaseAdapter {
         JSONObject jsonObject;
         JSONArray jsonArray = null;
         try {
-            likerS = new GetUserTask().execute(mUrlGetLikedPostsByID + postID).get();
+            likerS = new GetTask().execute(MainActivity.URL + "/all_likes_on_post/" + postID).get();
         } catch (InterruptedException | ExecutionException e) {
             likerS = "server error";
             e.printStackTrace();
@@ -179,7 +185,7 @@ public class FlowListAdapter extends BaseAdapter {
         Button recipeButton, likeButton;
     }
 
-    public String makePost(String url, String postId, String liker) {
+    public String makePost(String postId, String liker) {
         InputStream inputStream;
         String result;
         try {
@@ -187,7 +193,7 @@ public class FlowListAdapter extends BaseAdapter {
             HttpClient httpclient = new DefaultHttpClient();
 
             // Make makePost request to the given URL
-            HttpPost httpPost = new HttpPost(url);
+            HttpPost httpPost = new HttpPost(MainActivity.URL + "/like_post");
 
             String json;
 
@@ -218,15 +224,14 @@ public class FlowListAdapter extends BaseAdapter {
             result = "server error";
             e.printStackTrace();
         }
-
         return result;
     }
 
-    private class GetPostTask extends AsyncTask<Void, Void, String> {
+    private class MakeLikeTask extends AsyncTask<Void, Void, String> {
         String postId;
         String liker;
 
-        GetPostTask(String postId, String liker) {
+        MakeLikeTask(String postId, String liker) {
             this.postId = postId;
             this.liker = liker;
         }
@@ -234,7 +239,7 @@ public class FlowListAdapter extends BaseAdapter {
         @Override
         protected String doInBackground(Void... params) {
             String result;
-            String dict = makePost(mUrlLike, postId, liker);
+            String dict = makePost(postId, liker);
 
             try {
                 JSONObject jsonObject = new JSONObject(dict);
@@ -244,11 +249,6 @@ public class FlowListAdapter extends BaseAdapter {
                 e.printStackTrace();
             }
             return result;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-
         }
     }
 

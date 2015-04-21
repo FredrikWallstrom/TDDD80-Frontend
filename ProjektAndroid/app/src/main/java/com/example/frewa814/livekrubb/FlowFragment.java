@@ -43,8 +43,8 @@ public class FlowFragment extends ListFragment {
     private ArrayList myList = new ArrayList();
 
 
-    private String mGetAllPostsUrl = "http://10.0.2.2:3548/all_posts";
-    private String mGetPostAuthorByIDUrl = "http://10.0.2.2:3548/get_user_by_id/";
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -169,7 +169,7 @@ public class FlowFragment extends ListFragment {
         JSONObject jsonObject;
         JSONArray jsonArray;
         try {
-            postAuthor = new GetUserTask().execute(mGetPostAuthorByIDUrl + postAuthorID).get();
+            postAuthor = new GetTask().execute(MainActivity.URL + "/get_user_by_id/" + postAuthorID).get();
         } catch (InterruptedException | ExecutionException e) {
             postAuthor = "server error";
             e.printStackTrace();
@@ -193,7 +193,7 @@ public class FlowFragment extends ListFragment {
         JSONObject jsonObject;
         JSONArray jsonArray;
         try {
-            result = new GetUserTask().execute(mGetAllPostsUrl).get();
+            result = new GetTask().execute(MainActivity.URL + "/all_posts").get();
         } catch (InterruptedException | ExecutionException e) {
             result = "server error";
             e.printStackTrace();

@@ -46,7 +46,6 @@ public class RegisterActivity extends Activity{
     private String mUsername;
     private String mEmail;
     private String mPassword;
-    private String mUrl = "http://10.0.2.2:3548/add_user";
 
 
 
@@ -269,7 +268,7 @@ public class RegisterActivity extends Activity{
             }
 
             // Try to register the new account
-            String dict = makePost(mUrl);
+            String dict = makePost(MainActivity.URL + "/add_user");
 
             try {
                 JSONObject jsonObject = new JSONObject(dict);
