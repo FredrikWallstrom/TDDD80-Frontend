@@ -1,0 +1,38 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".MainActivity">
+
+    <!-- Search, should appear as action button -->
+    <item
+        android:id="@+id/action_search"
+        android:actionViewClass="android.widget.SearchView"
+        android:icon="@drawable/ic_search"
+        android:showAsAction="ifRoom|collapseActionView"
+        android:title="@string/search" />
+
+    <!-- Refresh -->
+    <item
+        android:id="@+id/action_refresh"
+        android:icon="@drawable/ic_refresh"
+        android:showAsAction="ifRoom"
+        android:title="@string/refresh" />
+
+
+    <item
+        android:id="@+id/menu_overflow"
+        android:icon="@drawable/ic_menu"
+        android:orderInCategory="11111"
+        android:showAsAction="always"
+        android:title="@string/over_flow">
+        <menu>
+
+            <!-- Log out -->
+            <item
+                android:id="@+id/action_logOut"
+                android:showAsAction="never"
+                android:title="@string/log_out" />
+        </menu>
+    </item>
+
+
+</menu>

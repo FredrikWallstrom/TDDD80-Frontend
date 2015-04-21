@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="action_menu">Menu</string>
+    <string name="back_button">New Button</string>
+    <string name="search">Search</string>
+    <string name="refresh">Refresh</string>
+    <string name="over_flow">overFlow</string>
+    <string name="log_out">Log out</string>
+
+</resources>

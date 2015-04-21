@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/RelativeLayout01"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="@android:color/darker_gray"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/relativeLayout">
+
+        <ListView
+            android:id="@android:id/list"
+            android:background="@android:color/background_light"
+            android:divider="@android:color/darker_gray"
+            android:scrollbars="none"
+            android:dividerHeight="30.0sp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:layout_below="@+id/relativeLayout"
+            android:layout_centerHorizontal="true" />
+
+        <RelativeLayout
+            android:background="@android:color/background_light"
+            android:layout_width="fill_parent"
+            android:layout_height="100dp"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:id="@+id/relativeLayout"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp">
+
+            <ImageView
+                android:id="@+id/icon"
+                android:layout_width="70dp"
+                android:layout_height="match_parent"
+                android:contentDescription="TODO"
+                android:src="@drawable/ic_launcher" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Share your Recipe here!"
+                android:background="@android:color/transparent"
+                android:id="@+id/button3"
+                android:layout_alignParentEnd="true"
+                android:layout_toEndOf="@+id/icon"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentTop="true" />
+
+        </RelativeLayout>
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/flowProgressBar"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true" />
+
+    </RelativeLayout>
+
+
+</RelativeLayout>
+
