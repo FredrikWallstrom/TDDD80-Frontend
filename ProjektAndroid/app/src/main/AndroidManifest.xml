@@ -26,6 +26,10 @@
 
         <activity
             android:name=".MainActivity"
+            android:theme="@style/CustomActionBarTheme"/>
+
+        <activity
+            android:name=".LoadingScreenActivity"
             android:theme="@style/CustomActionBarTheme">
 
 

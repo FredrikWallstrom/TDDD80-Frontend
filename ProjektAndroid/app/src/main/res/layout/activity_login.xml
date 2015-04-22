@@ -23,7 +23,7 @@
             <LinearLayout android:id="@+id/email_login_form" android:layout_width="match_parent"
                 android:layout_height="wrap_content" android:orientation="vertical">
 
-                <AutoCompleteTextView
+                <EditText
                     android:id="@+id/usernameField"
                     style="@style/edit_text_login_screen"
                     android:background="@drawable/fields_login_screen"

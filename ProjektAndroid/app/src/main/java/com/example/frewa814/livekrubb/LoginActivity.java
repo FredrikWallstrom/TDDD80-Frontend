@@ -6,6 +6,7 @@ import android.annotation.TargetApi;
 
 import android.app.Activity;
 import android.app.LoaderManager.LoaderCallbacks;
+import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
@@ -21,7 +22,9 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -53,7 +56,7 @@ import java.util.List;
  * https://developers.google.com/+/mobile/android/getting-started#step_1_enable_the_google_api
  * and follow the steps in "Step 1" to create an OAuth 2.0 client for your package.
  */
-public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
+public class LoginActivity extends Activity {
 
 
     /**
@@ -62,7 +65,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
     private UserLoginTask mAuthTask = null;
 
     // UI references.
-    private AutoCompleteTextView mUsernameView;
+    private EditText mUsernameView;
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
@@ -76,14 +79,14 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
         setContentView(R.layout.activity_login);
 
         // Set up the login form.
-        mUsernameView = (AutoCompleteTextView) findViewById(R.id.usernameField);
-        populateAutoComplete();
+        mUsernameView = (EditText) findViewById(R.id.usernameField);
 
         mPasswordView = (EditText) findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
                 if (id == R.id.login || id == EditorInfo.IME_NULL) {
+
                     attemptLogin();
                     return true;
                 }
@@ -117,17 +120,18 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
         startActivity(registerScreen);
     }
 
-    private void populateAutoComplete() {
-        getLoaderManager().initLoader(0, null, this);
+    private void hideKeyboard() {
+        InputMethodManager inputMgr = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputMgr.hideSoftInputFromWindow(mPasswordView.getWindowToken(), 0);
     }
-
-
     /**
      * Attempts to sign in.
      * If there are form errors (invalid email, missing fields, etc.), the
      * errors are presented and no actual login attempt is made.
      */
     public void attemptLogin() {
+        hideKeyboard();
+
         if (mAuthTask != null) {
             return;
         }
@@ -220,59 +224,6 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
     }
 
 
-    @Override
-    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        return new CursorLoader(this,
-                // Retrieve data rows for the device user's 'profile' contact.
-                Uri.withAppendedPath(ContactsContract.Profile.CONTENT_URI,
-                        ContactsContract.Contacts.Data.CONTENT_DIRECTORY), ProfileQuery.PROJECTION,
-
-                // Select only email addresses.
-                ContactsContract.Contacts.Data.MIMETYPE +
-                        " = ?", new String[]{ContactsContract.CommonDataKinds.Email
-                .CONTENT_ITEM_TYPE},
-
-                // Show primary email addresses first. Note that there won't be
-                // a primary email address if the user hasn't specified one.
-                ContactsContract.Contacts.Data.IS_PRIMARY + " DESC");
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
-        List<String> emails = new ArrayList<String>();
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast()) {
-            emails.add(cursor.getString(ProfileQuery.ADDRESS));
-            cursor.moveToNext();
-        }
-
-        addEmailsToAutoComplete(emails);
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> cursorLoader) {
-
-    }
-
-    private interface ProfileQuery {
-        String[] PROJECTION = {
-                ContactsContract.CommonDataKinds.Email.ADDRESS,
-                ContactsContract.CommonDataKinds.Email.IS_PRIMARY,
-        };
-
-        int ADDRESS = 0;
-        int IS_PRIMARY = 1;
-    }
-
-
-    private void addEmailsToAutoComplete(List<String> emailAddressCollection) {
-        //Create adapter to tell the AutoCompleteTextView what to show in its dropdown list.
-        ArrayAdapter<String> adapter =
-                new ArrayAdapter<String>(LoginActivity.this,
-                        android.R.layout.simple_dropdown_item_1line, emailAddressCollection);
-
-        mUsernameView.setAdapter(adapter);
-    }
 
     /**
      * Represents an asynchronous login/registration task used to authenticate
@@ -337,9 +288,10 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                     serverError.show();
                     break;
                 case "success":
+                    // Switch activity to MainActivity.
                     finish();
-                    Intent mainScreen = new Intent(getApplicationContext(), MainActivity.class);
-                    startActivity(mainScreen);
+                    Intent intent = new Intent(getApplicationContext(), LoadingScreenActivity.class);
+                    startActivity(intent);
                     break;
                 case "wrong email":
                     mUsernameView.setError(getString(R.string.error_incorrect_email));

@@ -39,6 +39,7 @@ public class FlowListAdapter extends BaseAdapter {
     Context context;
     private String mActivatedPerson = ActivatedPerson.activatedUsername;
 
+
     public FlowListAdapter(Context context, ArrayList myList) {
         this.myList = myList;
         this.context = context;
@@ -89,19 +90,11 @@ public class FlowListAdapter extends BaseAdapter {
         mViewHolder.recipeButton.setText(flowListData.getRecipeName());
 
         String postID = flowListData.getPostID();
+        JSONArray jsonArray = updateLikeView(postID, mViewHolder);
 
-
-        JSONArray jsonArray = updateLikeViews(postID);
         Boolean unLikeFlag = false;
         // Check if something was returned from the updateLikeViews.
         if (jsonArray != null) {
-            // Check how many user is liking the post.
-            if (jsonArray.length() == 0) {
-                mViewHolder.displayLikesView.setText("");
-            } else {
-                mViewHolder.displayLikesView.setText(jsonArray.length() + " " + "Likes");
-            }
-
             // Check if the one of the likerS is the activated person.
             for (int e = 0; e < jsonArray.length(); e++) {
                 try {
@@ -137,24 +130,24 @@ public class FlowListAdapter extends BaseAdapter {
 
                     if (result.equals("un_liked")) {
                         mViewHolder.likeButton.setText("Like");
-                        // TODO Uppdatera display likesview här
                     }
                     else{
                         mViewHolder.likeButton.setText("Unlike");
-                        // TODO Uppdatera display likesview här
                     }
+
+                    updateLikeView(postId, mViewHolder);
+
                 } catch (InterruptedException | ExecutionException | JSONException e) {
                     e.printStackTrace();
                 }
+
             }
         });
-
-
         return convertView;
     }
 
 
-    private JSONArray updateLikeViews(String postID) {
+    private JSONArray updateLikeView(String postID, MyViewHolder mViewHolder) {
         String likerS;
         JSONObject jsonObject;
         JSONArray jsonArray = null;
@@ -173,7 +166,13 @@ public class FlowListAdapter extends BaseAdapter {
                 e.printStackTrace();
             }
         }
-        if (jsonArray != null) {
+        if (jsonArray != null){
+            if (jsonArray.length() == 0) {
+                mViewHolder.displayLikesView.setText("");
+            }
+            else {
+                mViewHolder.displayLikesView.setText(jsonArray.length() + " " + "Likes");
+            }
             return jsonArray;
         }
         return null;
