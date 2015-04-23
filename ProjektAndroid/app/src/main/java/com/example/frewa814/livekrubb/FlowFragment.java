@@ -11,6 +11,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
@@ -43,8 +45,9 @@ public class FlowFragment extends ListFragment {
     private List<String> postInformationList;
     private List<String> postAuthorList;
     private List<String> postIDList;
-    private ArrayList myList = new ArrayList();
+    private ArrayList myList;
 
+    public ListAdapter flowAdapter;
 
 
 
@@ -55,7 +58,6 @@ public class FlowFragment extends ListFragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.flow_list, container, false);
-
         return rootView;
     }
 
@@ -73,6 +75,7 @@ public class FlowFragment extends ListFragment {
         postInformationList = new ArrayList<>();
         postAuthorList = new ArrayList<>();
         postIDList = new ArrayList<>();
+        myList = new ArrayList();
 
 
         try {

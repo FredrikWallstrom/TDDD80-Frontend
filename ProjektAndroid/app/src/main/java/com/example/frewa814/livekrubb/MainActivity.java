@@ -5,6 +5,7 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.app.ListActivity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.graphics.Color;
@@ -14,6 +15,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.ListAdapter;
 import android.widget.SearchView;
 
 
@@ -23,27 +26,34 @@ public class MainActivity extends Activity {
     private MenuItem mSearchButton;
     private MenuItem menuItem;
     private final int WAIT_TIME = 2500;
+    private ActionBar actionBar;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+     //   setContentView(R.layout.activity_main);
 
-        ActionBar ab = getActionBar();
+        // Notice that setContentView() is not used, because we use the root
+        // android.R.id.content as the container for each fragment
 
+        // Setup action bar for tabs.
+        actionBar = getActionBar();
+        if (actionBar != null) {
+            actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+            actionBar.setDisplayShowTitleEnabled(false);
 
-        if (ab != null) {
-            ab.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-            ActionBar.Tab tab = ab.newTab().setText("frag1")
-                    .setTabListener(new MyTabListener(this, FlowFragment.class.getName()));
-
-            ab.addTab(tab);
-
-            tab = ab.newTab().setText(R.string.my_page_fragment).
-                    setTabListener(new MyTabListener(this, MyPageFragment.class.getName()));
-
-            ab.addTab(tab);
+            // Add to Fragments to the actionbar tabs.
+            ActionBar.Tab tab = actionBar.newTab()
+                    .setText(R.string.flow_fragment)
+                    .setTag("FLOW_FRAGMENT")
+                    .setTabListener(new MyTabListener<>(this, "flow", FlowFragment.class));
+            actionBar.addTab(tab);
+            tab = actionBar.newTab()
+                    .setText(R.string.my_page_fragment)
+                    .setTag("MY_PAGE_FRAGMENT")
+                    .setTabListener(new MyTabListener<>(this, "my_page", MyPageFragment.class));
+            actionBar.addTab(tab);
         }
     }
 
@@ -90,14 +100,18 @@ public class MainActivity extends Activity {
                         FragmentManager fm = getFragmentManager();
                         FragmentTransaction ft = fm.beginTransaction();
 
+
                         // Check if the activated fragment was the FlowFragment.
-                        FlowFragment oldFlowFragment = (FlowFragment) fm.findFragmentByTag("FLOW_FRAGMENT");
-                        if (oldFlowFragment.isVisible()) {
+                   //     FlowFragment oldFlowFragment = (FlowFragment) fm.findFragmentByTag("FLOW_FRAGMENT");
+
+
+              /*          if (oldFlowFragment.isVisible()) {
                             // Replace the old FlowFragment with a new one, my type of updating a fragment.
                             FlowFragment updatedFlowFragment = new FlowFragment();
                             ft.replace(R.id.fragment_container, updatedFlowFragment, "FLOW_FRAGMENT");
                             ft.commit();
-                        }
+                        }*/
+
                         // Stop the progressbar and return the update icon.
                         menuItem.collapseActionView();
                         menuItem.setActionView(null);

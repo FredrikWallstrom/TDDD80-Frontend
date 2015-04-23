@@ -8,42 +8,46 @@ import android.app.FragmentTransaction;
 /**
  * Created by Fredrik on 2015-04-22.
  */
-public class MyTabListener implements ActionBar.TabListener {
-
+public class MyTabListener<T extends Fragment> implements ActionBar.TabListener {
     private Fragment mFragment;
     private final Activity mActivity;
-    private final String mFragName;
+    private final String mTag;
+    private final Class<T> mClass;
 
-    public MyTabListener( Activity activity,
-                          String fragName )
-    {
+    /** Constructor used each time a new tab is created.
+     * @param activity  The host Activity, used to instantiate the fragment
+     * @param tag  The identifier tag for the fragment
+     * @param clz  The fragment's Class, used to instantiate the fragment
+     */
+    public MyTabListener(Activity activity, String tag, Class<T> clz) {
         mActivity = activity;
-        mFragName = fragName;
+        mTag = tag;
+        mClass = clz;
     }
 
-    @Override
-    public void onTabReselected( ActionBar.Tab tab,
-                                 FragmentTransaction ft )
-    {
-        // TODO Auto-generated method stub
+    /* The following are each of the ActionBar.TabListener callbacks */
+
+    public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
+        // Check if the fragment is already initialized
+        if (mFragment == null) {
+            // If not, instantiate and add it to the activity
+            mFragment = Fragment.instantiate(mActivity, mClass.getName());
+            ft.add(android.R.id.content, mFragment, mTag);
+        } else {
+            // If it exists, simply attach it in order to show it
+            ft.attach(mFragment);
+        }
     }
 
-    @Override
-    public void onTabSelected( ActionBar.Tab tab,
-                               FragmentTransaction ft )
-    {
-        mFragment = Fragment.instantiate(mActivity,mFragName);
-        ft.add(android.R.id.content, mFragment );
+    public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft) {
+        if (mFragment != null) {
+            // Detach the fragment, because another one is being attached
+            ft.detach(mFragment);
+        }
     }
 
-
-
-    @Override
-    public void onTabUnselected( ActionBar.Tab tab,
-                                 FragmentTransaction ft )
-    {
-        ft.remove( mFragment );
-        mFragment = null;
+    public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
+        // User selected the already selected tab. Usually do nothing.
     }
 }
 

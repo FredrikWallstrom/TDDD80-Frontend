@@ -7,8 +7,9 @@
     <string name="refresh">Refresh</string>
     <string name="over_flow">overFlow</string>
     <string name="log_out">Log out</string>
-    <string name="search_hint">Search user</string>
+    <string name="search_hint">User</string>
     <string name="my_page_fragment">My Page</string>
+    <string name="flow_fragment">News</string>
 
 
 </resources>
