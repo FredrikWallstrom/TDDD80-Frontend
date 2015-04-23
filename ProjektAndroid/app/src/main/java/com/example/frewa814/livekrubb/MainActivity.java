@@ -1,11 +1,13 @@
 package com.example.frewa814.livekrubb;
 
+
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.app.ProgressDialog;
-import android.content.Intent;
-import android.os.AsyncTask;
+import android.app.SearchManager;
+import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Menu;
@@ -22,18 +24,26 @@ public class MainActivity extends Activity {
     private MenuItem menuItem;
     private final int WAIT_TIME = 2500;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if (findViewById(R.id.fragment_container) != null) {
-            // Create a new Fragment to be placed in the activity layout
-            FlowFragment flowFragment = new FlowFragment();
-            // Add the fragment to the 'fragment_container' FrameLayout
-            getFragmentManager().beginTransaction()
-                    .add(R.id.fragment_container, flowFragment, "FLOW_FRAGMENT")
-                    .commit();
+        ActionBar ab = getActionBar();
+
+
+        if (ab != null) {
+            ab.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+            ActionBar.Tab tab = ab.newTab().setText("frag1")
+                    .setTabListener(new MyTabListener(this, FlowFragment.class.getName()));
+
+            ab.addTab(tab);
+
+            tab = ab.newTab().setText(R.string.my_page_fragment).
+                    setTabListener(new MyTabListener(this, MyPageFragment.class.getName()));
+
+            ab.addTab(tab);
         }
     }
 
@@ -41,48 +51,23 @@ public class MainActivity extends Activity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu, this adds items to the action bar if it is present.
         MenuInflater inflater = getMenuInflater();
+
+
         inflater.inflate(R.menu.menu_main, menu);
-
-
         // Find the buttons in the action bar.
         mSearchButton = menu.findItem(R.id.action_search);
-
-
         // Find the search view for the search button.
         SearchView searchView = (SearchView) mSearchButton.getActionView();
 
-        // Display a hint on the searchView.
-        searchView.setQueryHint("Search User");
+        searchView.setSubmitButtonEnabled(true);
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
 
-        // Add a listener to the search button.
-        searchView.setOnQueryTextListener(searchListener);
-
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
 
 
         return super.onCreateOptionsMenu(menu);
 
     }
-
-
-    // Listener for the search button.
-    SearchView.OnQueryTextListener searchListener = new SearchView.OnQueryTextListener() {
-        @Override
-        public boolean onQueryTextChange(String arg0) {
-            return false;
-        }
-
-        @Override
-        public boolean onQueryTextSubmit(String query) {
-            // TODO query will be the entered name, so make an http get request here.
-
-            try {
-                mSearchButton.collapseActionView();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-            return true;
-        }
-    };
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -99,7 +84,7 @@ public class MainActivity extends Activity {
 
                 // Handler that wait for 2,5 sec, and than execute the new fragment.
                 // Just to inform the users that's something happend.
-                new Handler().postDelayed(new Runnable(){
+                new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         FragmentManager fm = getFragmentManager();
@@ -122,4 +107,6 @@ public class MainActivity extends Activity {
         }
         return true;
     }
+
+
 }

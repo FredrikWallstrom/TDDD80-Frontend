@@ -1,5 +1,5 @@
 <resources>
-    <string name="title">Livekrubb</string>
+    <string name="app_name">Livekrubb</string>
 
     <!-- Strings related to login -->
     <string name="prompt_username">Username</string>
