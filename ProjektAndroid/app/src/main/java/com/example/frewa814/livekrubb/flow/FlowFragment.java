@@ -1,21 +1,15 @@
-package com.example.frewa814.livekrubb;
+package com.example.frewa814.livekrubb.flow;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.annotation.TargetApi;
 import android.app.ListFragment;
-import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.ListAdapter;
-import android.widget.ListView;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
+
+import com.example.frewa814.livekrubb.asynctask.GetTask;
+import com.example.frewa814.livekrubb.activity.MainActivity;
+import com.example.frewa814.livekrubb.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -46,11 +40,6 @@ public class FlowFragment extends ListFragment {
     private List<String> postAuthorList;
     private List<String> postIDList;
     private ArrayList myList;
-
-    public ListAdapter flowAdapter;
-
-
-
 
 
     @Override

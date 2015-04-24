@@ -1,4 +1,4 @@
-package com.example.frewa814.livekrubb;
+package com.example.frewa814.livekrubb.flow;
 
 import android.content.Context;
 import android.os.AsyncTask;
@@ -9,6 +9,12 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.example.frewa814.livekrubb.misc.ActivatedUser;
+import com.example.frewa814.livekrubb.misc.AutoResizeTextView;
+import com.example.frewa814.livekrubb.asynctask.GetTask;
+import com.example.frewa814.livekrubb.activity.MainActivity;
+import com.example.frewa814.livekrubb.R;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -37,7 +43,7 @@ public class FlowListAdapter extends BaseAdapter {
     ArrayList myList = new ArrayList();
     LayoutInflater inflater;
     Context context;
-    private String mActivatedPerson = ActivatedPerson.activatedUsername;
+    private String mActivatedPerson = ActivatedUser.activatedUsername;
 
 
     public FlowListAdapter(Context context, ArrayList myList) {

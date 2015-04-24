@@ -13,7 +13,7 @@
         android:src="@drawable/ic_launcher" />
 
 
-    <com.example.frewa814.livekrubb.AutoResizeTextView
+    <com.example.frewa814.livekrubb.misc.AutoResizeTextView
         android:id="@+id/post_information"
         android:layout_width="match_parent"
         android:layout_height="80dip"

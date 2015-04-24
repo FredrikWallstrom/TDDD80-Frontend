@@ -4,7 +4,6 @@
     <style name="CustomActionBarTheme"
         parent="@android:style/Theme.Holo.Light">
         <item name="android:actionBarStyle">@style/MyActionBar</item>
-        <item name="android:actionBarTabStyle">@style/TabStyle</item>
     </style>
 
 
@@ -16,26 +15,11 @@
         <item name="displayOptions">showHome|useLogo</item>
     </style>
 
-
-    <!-- ActionBarTab styles -->
-    <style name="TabStyle"
-        parent="@android:style/Widget.Holo.Light.ActionBar.Solid.Inverse">
-        <item name="android:gravity">center</item>
-        <item name="android:background">@drawable/tab_bar_background</item>
-    </style>
-
     <!-- No Actionbar -->
     <style name="NoActionBar"
         parent="@android:style/Theme.Holo.Light">
         <item name="android:windowActionBar">false</item>
         <item name="android:windowNoTitle">true</item>
     </style>
-
-    <!-- ActionBarTab text styles -->
-    <style name="MyTheme.ActionBar.TabText" parent="android:style/Widget.Holo.ActionBar.TabText">
-        <!-- This is a PURPLE text color when selected and a WHITE color otherwise -->
-        <item name="android:textColor">@drawable/tab_bar_text</item>
-    </style>
-
 
 </resources>

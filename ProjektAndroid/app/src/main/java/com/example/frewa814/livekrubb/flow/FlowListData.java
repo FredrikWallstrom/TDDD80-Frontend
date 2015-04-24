@@ -1,4 +1,4 @@
-package com.example.frewa814.livekrubb;
+package com.example.frewa814.livekrubb.flow;
 
 /**
  * Created by Fredrik on 2015-04-09.

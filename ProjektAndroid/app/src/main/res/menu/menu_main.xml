@@ -2,13 +2,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".MainActivity">
 
-    <!-- Search, should appear as action button -->
-    <item
-        android:id="@+id/action_search"
-        android:actionViewClass="android.widget.SearchView"
+    <!-- Search -->
+    <item android:id="@+id/action_search"
+        android:title="@string/search"
         android:icon="@drawable/ic_search"
-        android:showAsAction="ifRoom|collapseActionView"
-        android:title="@string/search" />
+        android:showAsAction="collapseActionView|ifRoom"
+        android:actionViewClass="android.widget.SearchView" />
 
     <!-- Refresh -->
     <item
@@ -26,11 +25,25 @@
         android:title="@string/over_flow">
         <menu>
 
+            <!-- My page -->
+            <item
+                android:id="@+id/action_my_page"
+                android:showAsAction="never"
+                android:title="@string/my_page" />
+
+            <!-- Recipe Bank -->
+            <item
+                android:id="@+id/action_recipe_bank"
+                android:showAsAction="never"
+                android:title="@string/recipe_bank" />
+
             <!-- Log out -->
             <item
                 android:id="@+id/action_logOut"
                 android:showAsAction="never"
                 android:title="@string/log_out" />
+
+
         </menu>
     </item>
 

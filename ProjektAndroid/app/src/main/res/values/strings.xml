@@ -8,8 +8,9 @@
     <string name="over_flow">overFlow</string>
     <string name="log_out">Log out</string>
     <string name="search_hint">User</string>
-    <string name="my_page_fragment">My Page</string>
     <string name="flow_fragment">News</string>
+    <string name="recipe_bank">Recipebank</string>
+    <string name="my_page">My page</string>
 
 
 </resources>

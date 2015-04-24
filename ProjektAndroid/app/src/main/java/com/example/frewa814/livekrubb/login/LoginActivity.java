@@ -1,36 +1,31 @@
-package com.example.frewa814.livekrubb;
+package com.example.frewa814.livekrubb.login;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 
 import android.app.Activity;
-import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Context;
-import android.content.CursorLoader;
 import android.content.Intent;
-import android.content.Loader;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.AsyncTask;
 
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.frewa814.livekrubb.misc.ActivatedUser;
+import com.example.frewa814.livekrubb.activity.MainActivity;
+import com.example.frewa814.livekrubb.R;
+import com.example.frewa814.livekrubb.activity.LoadingScreenActivity;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -43,9 +38,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
 
 /**
@@ -264,7 +256,7 @@ public class LoginActivity extends Activity {
                 object = jsonArray.getJSONObject(0);
 
                 if (mPassword.equals(object.getString(PASSWORD_TAG))) {
-                    new ActivatedPerson(object);
+                    new ActivatedUser(object);
                 } else {
                     return "wrong password";
                 }
@@ -291,6 +283,7 @@ public class LoginActivity extends Activity {
                     // Switch activity to MainActivity.
                     finish();
                     Intent intent = new Intent(getApplicationContext(), LoadingScreenActivity.class);
+                    intent.putExtra("START_ACTIVITY", "MainActivity");
                     startActivity(intent);
                     break;
                 case "wrong email":

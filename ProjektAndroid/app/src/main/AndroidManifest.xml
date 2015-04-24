@@ -23,27 +23,21 @@
 
         <!-- Register activity -->
         <activity
-            android:name=".RegisterActivity"
+            android:name=".login.RegisterActivity"
             android:theme="@style/NoActionBar" />
 
         <!-- Loading screen activity -->
-        <activity android:name=".LoadingScreenActivity" />
+        <activity android:name=".activity.LoadingScreenActivity" />
 
         <!-- Main activity-->
-        <activity android:name=".MainActivity">
-            <meta-data
-                android:name="android.app.default_searchable"
-                android:value=".SearchResultsActivity" />
-        </activity>
-
-        <!-- Search results activity -->
-        <activity
-            android:name=".SearchResultsActivity"
-            android:parentActivityName=".MainActivity">
+        <activity android:name=".activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
 
+            <meta-data
+                android:name="android.app.default_searchable"
+                android:value=".activity.MainActivity" />
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
@@ -51,7 +45,7 @@
 
         <!-- Login activity -->
         <activity
-            android:name=".LoginActivity"
+            android:name=".login.LoginActivity"
             android:theme="@style/NoActionBar"
             android:windowSoftInputMode="adjustResize|stateHidden">
             <intent-filter>

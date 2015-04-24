@@ -1,4 +1,4 @@
-package com.example.frewa814.livekrubb;
+package com.example.frewa814.livekrubb.login;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -9,20 +9,21 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.frewa814.livekrubb.R;
+import com.example.frewa814.livekrubb.activity.MainActivity;
+import com.example.frewa814.livekrubb.login.LoginActivity;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.util.EntityUtils;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
