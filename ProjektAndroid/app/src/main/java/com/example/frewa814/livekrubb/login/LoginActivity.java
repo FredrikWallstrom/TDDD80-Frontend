@@ -22,6 +22,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.frewa814.livekrubb.asynctask.GetTask;
 import com.example.frewa814.livekrubb.misc.ActivatedUser;
 import com.example.frewa814.livekrubb.activity.MainActivity;
 import com.example.frewa814.livekrubb.R;
@@ -38,6 +39,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.concurrent.ExecutionException;
 
 
 /**
@@ -172,11 +174,11 @@ public class LoginActivity extends Activity {
     }
 
     private boolean isUsernameValid(String username) {
-        return username.length() > 4;
+        return username.length() > 4 && !username.contains(" ");
     }
 
     private boolean isPasswordValid(String password) {
-        return password.length() > 4;
+        return password.length() > 4  && !password.contains(" ");
     }
 
     /**
@@ -218,8 +220,7 @@ public class LoginActivity extends Activity {
 
 
     /**
-     * Represents an asynchronous login/registration task used to authenticate
-     * the user.
+     * Represents an asynchronous login task used to authenticate the user.
      */
     private class UserLoginTask extends AsyncTask<Void, Void, String> {
 
@@ -235,9 +236,10 @@ public class LoginActivity extends Activity {
         protected String doInBackground(Void... params) {
             JSONObject jsonObject;
             JSONObject object;
+            String user;
 
-            // Get user from server.
-            String user = getUser(mUsername);
+            // Get the user from the database.
+            user = getUser(mUsername);
 
             try {
                 // Simulate network access.
@@ -247,14 +249,15 @@ public class LoginActivity extends Activity {
             }
 
             try {
+                // If we don't got any return from the database, the user enter wrong username
                 jsonObject = new JSONObject(user);
                 JSONArray jsonArray = jsonObject.getJSONArray(USER_TAG);
                 if (jsonArray.length() == 0) {
-                    return "wrong email";
+                    return "wrong username";
 
                 }
+                // Check if the user entered right password.
                 object = jsonArray.getJSONObject(0);
-
                 if (mPassword.equals(object.getString(PASSWORD_TAG))) {
                     new ActivatedUser(object);
                 } else {
@@ -264,7 +267,6 @@ public class LoginActivity extends Activity {
             } catch (JSONException e) {
                 e.printStackTrace();
                 return "server error";
-
             }
             return "success";
         }
@@ -286,8 +288,8 @@ public class LoginActivity extends Activity {
                     intent.putExtra("START_ACTIVITY", "MainActivity");
                     startActivity(intent);
                     break;
-                case "wrong email":
-                    mUsernameView.setError(getString(R.string.error_incorrect_email));
+                case "wrong username":
+                    mUsernameView.setError(getString(R.string.error_invalid_username));
                     mUsernameView.requestFocus();
                     break;
                 default:

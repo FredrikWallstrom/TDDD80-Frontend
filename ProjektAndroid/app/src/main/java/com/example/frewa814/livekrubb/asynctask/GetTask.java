@@ -15,7 +15,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 /**
- * Created by Fredrik on 2015-04-15.
+ * A general getTask that will get something from the database and return a inputStream as a string.
  */
 public class GetTask extends AsyncTask<String, Void, String> {
 

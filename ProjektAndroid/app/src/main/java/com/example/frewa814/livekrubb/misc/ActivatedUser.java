@@ -4,7 +4,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * Created by Fredrik on 2015-04-13.
+ * Save all information about the user if the user succeed to log in.
+ * The fields are static so I can easy get them and compare where i need to do it.
  */
 public class ActivatedUser {
 

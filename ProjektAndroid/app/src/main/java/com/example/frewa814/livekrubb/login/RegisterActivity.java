@@ -35,7 +35,7 @@ import java.io.InputStreamReader;
 /**
  * Created by Fredrik on 2015-03-30.
  */
-public class RegisterActivity extends Activity{
+public class RegisterActivity extends Activity {
 
     private static final String RESULT_TAG = "result";
     private EditText mUsernameView;
@@ -47,7 +47,6 @@ public class RegisterActivity extends Activity{
     private String mUsername;
     private String mEmail;
     private String mPassword;
-
 
 
     /**
@@ -104,29 +103,21 @@ public class RegisterActivity extends Activity{
 
 
         // Check for a valid password, if the user entered one.
-        if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
+        if (!isPasswordValid(password)) {
             mPasswordView.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordView;
             cancel = true;
         }
 
         // Check for a valid email address.
-        if (!TextUtils.isEmpty(email) && !isEmailValid(email)){
-            mEmailView.setError(getString(R.string.error_field_required));
-            focusView = mEmailView;
-            cancel = true;
-        } else if (!isEmailValid(email)){
+        if (!isEmailValid(email)) {
             mEmailView.setError(getString(R.string.error_invalid_email));
             focusView = mEmailView;
             cancel = true;
         }
 
         // Check for a valid username, if the user entered one.
-        if (TextUtils.isEmpty(username)) {
-            mUsernameView.setError(getString(R.string.error_field_required));
-            focusView = mUsernameView;
-            cancel = true;
-        } else if (!isUsernameValid(username)) {
+        if (!isUsernameValid(username)) {
             mUsernameView.setError(getString(R.string.error_invalid_username));
             focusView = mUsernameView;
             cancel = true;
@@ -146,15 +137,15 @@ public class RegisterActivity extends Activity{
     }
 
     private boolean isUsernameValid(String username) {
-        return username.length() > 4;
+        return username.length() > 4 && !username.contains(" ");
     }
 
     private boolean isEmailValid(String email) {
-        return email.contains("@");
+        return email.length() > 4 && email.contains("@") && !email.contains(" ");
     }
 
     private boolean isPasswordValid(String password) {
-        return password.length() > 4;
+        return password.length() > 4 && !password.contains(" ");
     }
 
 
@@ -239,10 +230,10 @@ public class RegisterActivity extends Activity{
     }
 
     private String convertInputStreamToString(InputStream inputStream) throws IOException {
-        BufferedReader bufferedReader = new BufferedReader( new InputStreamReader(inputStream));
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
         String line;
         String result = "";
-        while((line = bufferedReader.readLine()) != null)
+        while ((line = bufferedReader.readLine()) != null)
             result += line;
 
         inputStream.close();

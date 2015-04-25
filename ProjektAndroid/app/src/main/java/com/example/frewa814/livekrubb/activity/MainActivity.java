@@ -15,13 +15,16 @@ import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.SearchView;
 
 import com.example.frewa814.livekrubb.R;
 import com.example.frewa814.livekrubb.asynctask.GetTask;
 import com.example.frewa814.livekrubb.flow.FlowFragment;
 import com.example.frewa814.livekrubb.mypage.MyPageFragment;
+import com.example.frewa814.livekrubb.recipebank.OnButtonClickedListener;
 import com.example.frewa814.livekrubb.recipebank.RecipeFragment;
+import com.example.frewa814.livekrubb.recipebank.ToplistFragment;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -32,7 +35,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements OnButtonClickedListener {
 
     public final static String URL = "http://livekrubb-frewa814.openshift.ida.liu.se";
     private static final String USER_TAG = "users";
@@ -152,6 +155,7 @@ public class MainActivity extends Activity {
                 Fragment oldFragment = getFragmentManager().findFragmentById(R.id.fragment_container);
 
 
+
                 // Check if the activated fragment was the FlowFragment.
                 if (oldFragment instanceof FlowFragment) {
                     // Replace the old FlowFragment with a new one, my type of updating a fragment.
@@ -162,7 +166,7 @@ public class MainActivity extends Activity {
                 // Check if the activated fragment was the RecipeFragment.
                 if (oldFragment instanceof RecipeFragment) {
                     // Replace the old FlowFragment with a new one, my type of updating a fragment.
-                    FlowFragment updatedRecipeBankFragment = new FlowFragment();
+                    RecipeFragment updatedRecipeBankFragment = new RecipeFragment();
                     ft.replace(R.id.fragment_container, updatedRecipeBankFragment);
                     ft.commit();
                 }
@@ -246,6 +250,30 @@ public class MainActivity extends Activity {
             }
         }
         return items;
+    }
+
+
+    /**
+     * Handle the buttons click from recipe bank fragment and toplist fragment to display the right fragment.
+     * It's like tabs.
+     * @param view got the information on which fragment there is to display.
+     */
+    @Override
+    public void onButtonClicked(View view) {
+        FragmentManager fm = getFragmentManager();
+        FragmentTransaction ft = fm.beginTransaction();
+        // Switch to replace the fragment with the right one.
+        switch (view.getId()){
+            case R.id.toplist_button:
+                ToplistFragment toplistFragment = new ToplistFragment();
+                ft.replace(R.id.fragment_container, toplistFragment);
+                ft.commit();
+                break;
+            case R.id.recipe_bank_button:
+                RecipeFragment recipeFragment = new RecipeFragment();
+                ft.replace(R.id.fragment_container, recipeFragment);
+                ft.commit();
+        }
     }
 }
 

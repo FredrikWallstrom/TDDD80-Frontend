@@ -16,7 +16,7 @@
         android:showAsAction="always"
         android:title="@string/refresh" />
 
-
+    <!-- Menu -->
     <item
         android:id="@+id/menu_overflow"
         android:icon="@drawable/ic_menu"
@@ -24,7 +24,6 @@
         android:showAsAction="always"
         android:title="@string/over_flow">
         <menu>
-
             <!-- My page -->
             <item
                 android:id="@+id/action_my_page"
@@ -42,8 +41,6 @@
                 android:id="@+id/action_logOut"
                 android:showAsAction="never"
                 android:title="@string/log_out" />
-
-
         </menu>
     </item>
 

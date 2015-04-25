@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 /**
- * Created by Fredrik on 06/04/2015.
+ * Fragment that gonna represent the flow.
  */
 public class FlowFragment extends ListFragment {
 
@@ -31,14 +31,10 @@ public class FlowFragment extends ListFragment {
     private static final String POST_INFORMATION_TAG = "post_information";
     private static final String POST_AUTHOR_ID_TAG = "user_id";
     private static final String USERNAME_TAG = "username";
-    private final static String USER_TAG = "user";
+    private static final String USER_TAG = "user";
     private static final String ID_TAG = "id";
-    public static JSONArray posts;
 
-    private List<String> recipeNameList;
-    private List<String> postInformationList;
-    private List<String> postAuthorList;
-    private List<String> postIDList;
+    public static JSONArray posts;
     private ArrayList myList;
 
 
@@ -53,19 +49,21 @@ public class FlowFragment extends ListFragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        getDataInList();
-        FlowListAdapter adapter = new FlowListAdapter(getActivity(), myList);
 
+        // Get all posts in the database that's gonna represent the flow.
+        getDataInList();
+
+        // Make custom adapter and set it to the listview.
+        FlowListAdapter adapter = new FlowListAdapter(getActivity(), myList);
         setListAdapter(adapter);
     }
 
     private void getDataInList() {
-        recipeNameList = new ArrayList<>();
-        postInformationList = new ArrayList<>();
-        postAuthorList = new ArrayList<>();
-        postIDList = new ArrayList<>();
+        List<String> recipeNameList = new ArrayList<>();
+        List<String> postInformationList = new ArrayList<>();
+        List<String> postAuthorList = new ArrayList<>();
+        List<String> postIDList = new ArrayList<>();
         myList = new ArrayList();
-
 
         try {
             posts = getAllPosts();
@@ -93,12 +91,9 @@ public class FlowFragment extends ListFragment {
                     Toast serverError = Toast.makeText(getActivity(), "Your flow is empty. Search some friends and follow them!", Toast.LENGTH_LONG);
                     serverError.show();
                 }
-
             } else {
-
                 Toast serverError = Toast.makeText(getActivity(), "Failed to update, Try again!", Toast.LENGTH_LONG);
                 serverError.show();
-
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -106,8 +101,8 @@ public class FlowFragment extends ListFragment {
 
         Integer loopInteger = 0;
         while (recipeNameList.size() > loopInteger) {
-            // Create a new object for each list item
 
+            // Create a new object for each list item
             FlowListData flowListData = new FlowListData();
             flowListData.setPostAuthor(postAuthorList.get(loopInteger));
             flowListData.setRecipeName(recipeNameList.get(loopInteger));
@@ -120,6 +115,9 @@ public class FlowFragment extends ListFragment {
         }
     }
 
+    /**
+     * I Implemented an own sort method that's is sorting the posts by the timestamp column.
+     */
     private JSONArray getPostsSorted(JSONArray posts) {
         List<JSONObject> jsonValues = new ArrayList<>();
         for (int i = 0; i <posts.length(); i++)
@@ -131,8 +129,8 @@ public class FlowFragment extends ListFragment {
         Collections.sort(jsonValues, new Comparator<JSONObject>() {
             @Override
             public int compare(JSONObject lhs, JSONObject rhs) {
-                String valA = new String();
-                String valB = new String();
+                String valA = "";
+                String valB = "";
                 try {
                     valA = lhs.getString("timestamp");
                     valB = rhs.getString("timestamp");
@@ -148,11 +146,12 @@ public class FlowFragment extends ListFragment {
                 return 0;
             }
         });
-        JSONArray sortedJsonArray = new JSONArray(jsonValues);
-
-        return sortedJsonArray;
+        return new JSONArray(jsonValues);
     }
 
+    /**
+     * Get the posts author from the database.
+     */
     private String getPostAuthor(String postAuthorID) {
         String postAuthor;
         String postAuthorName = null;
@@ -178,6 +177,9 @@ public class FlowFragment extends ListFragment {
         return postAuthorName;
     }
 
+    /**
+     * Get all posts from the database.
+     */
     private JSONArray getAllPosts() {
         String result;
         JSONObject jsonObject;
@@ -195,8 +197,7 @@ public class FlowFragment extends ListFragment {
                 jsonArray = jsonObject.getJSONArray(POST_TAG);
                 return jsonArray;
             } catch (JSONException e) {
-                JSONArray emptyFlow = new JSONArray();
-                return emptyFlow;
+                return new JSONArray();
             }
         } else {
             return null;

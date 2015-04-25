@@ -1,7 +1,7 @@
 package com.example.frewa814.livekrubb.flow;
 
 /**
- * Created by Fredrik on 2015-04-09.
+ * Used to create object with the data that's gonna represent the flow.
  */
 public class FlowListData {
     String postAuthor;

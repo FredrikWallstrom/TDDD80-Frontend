@@ -7,10 +7,12 @@
     <string name="refresh">Refresh</string>
     <string name="over_flow">overFlow</string>
     <string name="log_out">Log out</string>
-    <string name="search_hint">User</string>
+    <string name="search_hint">Search user</string>
     <string name="flow_fragment">News</string>
     <string name="recipe_bank">Recipebank</string>
     <string name="my_page">My page</string>
+    <string name="description_items_search">Each item for search dropdownlist</string>
+
 
 
 </resources>

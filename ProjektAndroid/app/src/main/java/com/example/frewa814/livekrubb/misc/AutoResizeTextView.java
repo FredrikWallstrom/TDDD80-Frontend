@@ -1,9 +1,5 @@
 package com.example.frewa814.livekrubb.misc;
 
-/**
- * Created by Fredrik on 2015-04-13.
- */
-
 import android.content.Context;
 import android.text.Layout.Alignment;
 import android.text.StaticLayout;
@@ -16,25 +12,15 @@ import android.widget.TextView;
  * Text view that auto adjusts text size to fit within the view.
  * If the text size equals the minimum text size and still does not
  * fit, append with an ellipsis.
- *
- * @author Chase Colburn
- * @since Apr 4, 2011
+ * This is used in the flowFragment so the user can write to long in the recipe information view.
  */
 public class AutoResizeTextView extends TextView {
 
     // Minimum text size for this text view
     public static final float MIN_TEXT_SIZE = 20;
 
-    // Interface for resize notifications
-    public interface OnTextResizeListener {
-        public void onTextResize(TextView textView, float oldSize, float newSize);
-    }
-
     // Our ellipse string
     private static final String mEllipsis = "...";
-
-    // Registered resize listener
-    private OnTextResizeListener mTextResizeListener;
 
     // Flag for text and/or size changes to force a resize
     private boolean mNeedsResize = false;
@@ -94,14 +80,6 @@ public class AutoResizeTextView extends TextView {
     }
 
     /**
-     * Register listener to receive resize notifications
-     * @param listener
-     */
-    public void setOnResizeListener(OnTextResizeListener listener) {
-        mTextResizeListener = listener;
-    }
-
-    /**
      * Override the set text size to update our internal reference values
      */
     @Override
@@ -130,58 +108,6 @@ public class AutoResizeTextView extends TextView {
     }
 
     /**
-     * Set the upper text size limit and invalidate the view
-     * @param maxTextSize
-     */
-    public void setMaxTextSize(float maxTextSize) {
-        mMaxTextSize = maxTextSize;
-        requestLayout();
-        invalidate();
-    }
-
-    /**
-     * Return upper text size limit
-     * @return
-     */
-    public float getMaxTextSize() {
-        return mMaxTextSize;
-    }
-
-    /**
-     * Set the lower text size limit and invalidate the view
-     * @param minTextSize
-     */
-    public void setMinTextSize(float minTextSize) {
-        mMinTextSize = minTextSize;
-        requestLayout();
-        invalidate();
-    }
-
-    /**
-     * Return lower text size limit
-     * @return
-     */
-    public float getMinTextSize() {
-        return mMinTextSize;
-    }
-
-    /**
-     * Set flag to add ellipsis to text that overflows at the smallest text size
-     * @param addEllipsis
-     */
-    public void setAddEllipsis(boolean addEllipsis) {
-        mAddEllipsis = addEllipsis;
-    }
-
-    /**
-     * Return flag to add ellipsis to text that overflows at the smallest text size
-     * @return
-     */
-    public boolean getAddEllipsis() {
-        return mAddEllipsis;
-    }
-
-    /**
      * Reset the text to the original size
      */
     public void resetTextSize() {
@@ -205,19 +131,7 @@ public class AutoResizeTextView extends TextView {
     }
 
     /**
-     * Resize the text size with default width and height
-     */
-    public void resizeText() {
-
-        int heightLimit = getHeight() - getPaddingBottom() - getPaddingTop();
-        int widthLimit = getWidth() - getPaddingLeft() - getPaddingRight();
-        resizeText(widthLimit, heightLimit);
-    }
-
-    /**
      * Resize the text size with specified width and height
-     * @param width
-     * @param height
      */
     public void resizeText(int width, int height) {
         CharSequence text = getText();
@@ -284,10 +198,6 @@ public class AutoResizeTextView extends TextView {
         setTextSize(TypedValue.COMPLEX_UNIT_PX, targetTextSize);
         setLineSpacing(mSpacingAdd, mSpacingMult);
 
-        // Notify the listener if registered
-        if (mTextResizeListener != null) {
-            mTextResizeListener.onTextResize(this, oldTextSize, targetTextSize);
-        }
 
         // Reset force resize flag
         mNeedsResize = false;
