@@ -11,7 +11,7 @@ import com.example.frewa814.livekrubb.login.LoginActivity;
 /**
  * An activity that will display an loading screen between activity shifts.
  * This is used when a user logging and when a user log out.
- * This is for the user to se something is happening.
+ * This is for the user to se that something is happening.
  */
 public class LoadingScreenActivity extends Activity {
     //Introduce an delay

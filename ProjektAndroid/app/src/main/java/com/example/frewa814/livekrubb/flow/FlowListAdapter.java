@@ -33,23 +33,22 @@ import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
 /**
- * Created by Fredrik on 06/04/2015.
+ * Adapter for the FlowFragment.
  */
 public class FlowListAdapter extends BaseAdapter {
 
     private static final String RESULT_TAG = "result";
     private static final String LIKES_TAG = "likes";
     private static final String USERNAME_TAG = "username";
-    ArrayList myList = new ArrayList();
-    LayoutInflater inflater;
-    Context context;
+    private ArrayList myList = new ArrayList();
+    private LayoutInflater inflater;
     private String mActivatedPerson = ActivatedUser.activatedUsername;
 
 
-    public FlowListAdapter(Context context, ArrayList myList) {
+    public FlowListAdapter(Context cont, ArrayList myList) {
         this.myList = myList;
-        this.context = context;
-        inflater = LayoutInflater.from(this.context);
+        Context context = cont;
+        inflater = LayoutInflater.from(context);
     }
 
     @Override
@@ -67,6 +66,9 @@ public class FlowListAdapter extends BaseAdapter {
         return 0;
     }
 
+    /**
+     * This will run every time there is a post that's will need to be loaded.
+     */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         final MyViewHolder mViewHolder;
@@ -75,7 +77,7 @@ public class FlowListAdapter extends BaseAdapter {
             convertView = inflater.inflate(R.layout.flow_list_item, parent, false);
             mViewHolder = new MyViewHolder();
 
-            // Set up the ViewHolder
+            // Set up the ViewHolder one time.
             mViewHolder.postAuthorView = (TextView) convertView.findViewById(R.id.post_author);
             mViewHolder.recipeButton = (Button) convertView.findViewById(R.id.recipe_button);
             mViewHolder.postInformationView = (AutoResizeTextView) convertView.findViewById(R.id.post_information);
@@ -89,19 +91,23 @@ public class FlowListAdapter extends BaseAdapter {
             mViewHolder = (MyViewHolder) convertView.getTag();
         }
 
+        // Get the right data from the flowListData that will be displayed on the post.
         FlowListData flowListData = (FlowListData) myList.get(position);
 
+        // Set the text in the views on the post items.
         mViewHolder.postAuthorView.setText(flowListData.getPostAuthor());
         mViewHolder.postInformationView.setText(flowListData.getPostInformation());
         mViewHolder.recipeButton.setText(flowListData.getRecipeName());
 
+        // Get the postID
         String postID = flowListData.getPostID();
+        // Update how many likes there is on the post.
         JSONArray jsonArray = updateLikeView(postID, mViewHolder);
 
         Boolean unLikeFlag = false;
         // Check if something was returned from the updateLikeViews.
         if (jsonArray != null) {
-            // Check if the one of the likerS is the activated person.
+            // Check if one of the likerS is the activated person.
             for (int e = 0; e < jsonArray.length(); e++) {
                 try {
                     JSONObject jsonObject = jsonArray.getJSONObject(e);
@@ -121,19 +127,24 @@ public class FlowListAdapter extends BaseAdapter {
             }
         }
 
-
+        // Click listener for the like button.
         mViewHolder.likeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Get the position in the list for the clicked post.
                 View parentRow = (View) v.getParent();
                 ListView listView = (ListView) parentRow.getParent();
                 int position = listView.getPositionForView(parentRow);
+
                 try {
+                    // Make an like or unlike depend what the user want
+                    // (the database will check if the user is liking the post already).
                     JSONObject likedPost = (JSONObject) FlowFragment.posts.get(position);
                     String postId = likedPost.getString("id");
                     MakeLikeTask postTask = new MakeLikeTask(postId, mActivatedPerson);
                     String result = postTask.execute((Void) null).get();
 
+                    // Check if the user want to unlike or like and set the right text to the button.
                     if (result.equals("un_liked")) {
                         mViewHolder.likeButton.setText("Like");
                     }
@@ -141,12 +152,12 @@ public class FlowListAdapter extends BaseAdapter {
                         mViewHolder.likeButton.setText("Unlike");
                     }
 
+                    // Update the likeView.
                     updateLikeView(postId, mViewHolder);
 
                 } catch (InterruptedException | ExecutionException | JSONException e) {
                     e.printStackTrace();
                 }
-
             }
         });
         return convertView;
@@ -184,12 +195,18 @@ public class FlowListAdapter extends BaseAdapter {
         return null;
     }
 
-
+    /**
+     * ViewHolder for all views in one list item.
+     */
     private static class MyViewHolder {
         TextView postAuthorView, postInformationView, displayCommentsView, displayLikesView;
         Button recipeButton, likeButton;
     }
 
+    /**
+     * This method will make a post to the database and like or unlike one post
+     * depend if the user already like the post or not.
+     */
     public String makePost(String postId, String liker) {
         InputStream inputStream;
         String result;
@@ -232,6 +249,11 @@ public class FlowListAdapter extends BaseAdapter {
         return result;
     }
 
+    /**
+     * Private task class that will be running in the background,
+     * when it is done it will return the result to the onClickListener for the like button.
+     * @result will be "liked" or "un_liked" depend on what the database has did.
+     */
     private class MakeLikeTask extends AsyncTask<Void, Void, String> {
         String postId;
         String liker;
