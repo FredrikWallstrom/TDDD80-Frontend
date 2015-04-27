@@ -27,13 +27,14 @@
             <LinearLayout
                 android:id="@+id/email_login_form"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:weightSum="1">
 
                 <Button
                     android:id="@+id/back_from_register_button"
                     style="@style/buttons_login_screen"
-                    android:background="@drawable/custom_buttons"
+                    android:background="@drawable/buttons_login_api"
                     android:layout_width="147dp"
                     android:layout_height="62dp"
                     android:text="@string/action_back"
@@ -41,18 +42,19 @@
 
 
                 <TextView
+                    android:layout_width="310dp"
+                    android:layout_height="100dp"
+                    android:text="You are only one step from get your day saved. Just enter your information below and click register."
                     android:id="@+id/textView"
-                    android:layout_width="fill_parent"
-                    android:layout_height="93dp"
                     android:layout_gravity="center_horizontal"
-                    android:text="New Text" />
+                    android:layout_marginTop="40dp" />
 
                 <EditText
                     android:id="@+id/register_username"
                     style="@style/edit_text_login_screen"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/fields_login_screen"
+                    android:background="@drawable/fields_login_api"
                     android:hint="@string/prompt_username"
                     android:imeActionLabel="@string/action_sign_in_short"
                     android:imeOptions="actionUnspecified"
@@ -65,7 +67,7 @@
                     style="@style/edit_text_login_screen"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/fields_login_screen"
+                    android:background="@drawable/fields_login_api"
                     android:hint="@string/prompt_email"
                     android:imeActionLabel="@string/action_sign_in_short"
                     android:imeOptions="actionUnspecified"
@@ -78,7 +80,7 @@
                     style="@style/edit_text_login_screen"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/fields_login_screen"
+                    android:background="@drawable/fields_login_api"
                     android:hint="@string/prompt_password"
                     android:imeActionLabel="@string/action_sign_in_short"
                     android:imeOptions="actionUnspecified"

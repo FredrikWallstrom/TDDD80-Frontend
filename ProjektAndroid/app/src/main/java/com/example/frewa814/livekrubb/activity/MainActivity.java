@@ -1,6 +1,7 @@
 package com.example.frewa814.livekrubb.activity;
 
 import android.annotation.TargetApi;
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -21,6 +22,7 @@ import android.widget.SearchView;
 import com.example.frewa814.livekrubb.R;
 import com.example.frewa814.livekrubb.asynctask.GetTask;
 import com.example.frewa814.livekrubb.flow.FlowFragment;
+import com.example.frewa814.livekrubb.flow.ShareRecipeFragment;
 import com.example.frewa814.livekrubb.mypage.MyPageFragment;
 import com.example.frewa814.livekrubb.recipebank.OnButtonClickedListener;
 import com.example.frewa814.livekrubb.recipebank.RecipeFragment;
@@ -40,7 +42,6 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
     public final static String URL = "http://livekrubb-frewa814.openshift.ida.liu.se";
     private static final String USER_TAG = "users";
     private static final String USERNAME_TAG = "username";
-    private MenuItem mSearchButton;
     private MenuItem menuItem;
     private static final int WAIT_TIME = 2500;
     private Menu menu;
@@ -153,8 +154,6 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
                 FragmentTransaction ft = fm.beginTransaction();
 
                 Fragment oldFragment = getFragmentManager().findFragmentById(R.id.fragment_container);
-
-
 
                 // Check if the activated fragment was the FlowFragment.
                 if (oldFragment instanceof FlowFragment) {
@@ -273,7 +272,22 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
                 RecipeFragment recipeFragment = new RecipeFragment();
                 ft.replace(R.id.fragment_container, recipeFragment);
                 ft.commit();
+            case R.id.share_recipe_button:
+                ShareRecipeFragment shareRecipeFragment = new ShareRecipeFragment();
+                ft.replace(R.id.fragment_container, shareRecipeFragment);
+                ft.addToBackStack(null);
+                ft.commit();
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        ActionBar actionBar = this.getActionBar();
+        if (actionBar != null) {
+            actionBar.show();
+        }
+        super.onBackPressed();
+
     }
 }
 

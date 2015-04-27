@@ -143,18 +143,14 @@ public class LoginActivity extends Activity {
 
 
         // Check for a valid password, if the user entered one.
-        if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
+        if (!isPasswordValid(password)) {
             mPasswordView.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordView;
             cancel = true;
         }
 
         // Check for a valid username.
-        if (TextUtils.isEmpty(username)) {
-            mUsernameView.setError(getString(R.string.error_field_required));
-            focusView = mUsernameView;
-            cancel = true;
-        } else if (!isUsernameValid(username)) {
+        if (!isUsernameValid(username)) {
             mUsernameView.setError(getString(R.string.error_invalid_username));
             focusView = mUsernameView;
             cancel = true;
@@ -289,7 +285,7 @@ public class LoginActivity extends Activity {
                     startActivity(intent);
                     break;
                 case "wrong username":
-                    mUsernameView.setError(getString(R.string.error_invalid_username));
+                    mUsernameView.setError(getString(R.string.error_incorrect_username));
                     mUsernameView.requestFocus();
                     break;
                 default:

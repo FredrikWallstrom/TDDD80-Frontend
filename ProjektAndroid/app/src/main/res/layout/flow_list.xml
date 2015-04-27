@@ -46,7 +46,7 @@
                 android:src="@drawable/ic_launcher" />
 
             <Button
-                android:id="@+id/button3"
+                android:id="@+id/share_recipe_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"

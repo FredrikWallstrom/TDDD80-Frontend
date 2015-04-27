@@ -41,7 +41,7 @@ public class RecipeFragment extends Fragment {
         return rootView;
     }
 
-    // When the button is clicked, notify the activity.
+    // When a button is clicked, notify the activity.
     // MainActivity will then create the new fragment.
     View.OnClickListener clickListener = new View.OnClickListener() {
         @Override

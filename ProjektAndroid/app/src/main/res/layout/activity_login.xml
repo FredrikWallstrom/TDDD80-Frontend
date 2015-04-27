@@ -21,12 +21,13 @@
             android:orientation="vertical">
 
             <LinearLayout android:id="@+id/email_login_form" android:layout_width="match_parent"
-                android:layout_height="wrap_content" android:orientation="vertical">
+                android:layout_height="wrap_content" android:orientation="vertical"
+                android:weightSum="1">
 
                 <EditText
                     android:id="@+id/usernameField"
                     style="@style/edit_text_login_screen"
-                    android:background="@drawable/fields_login_screen"
+                    android:background="@drawable/fields_login_api"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/prompt_username"
@@ -41,7 +42,7 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/prompt_password"
                     android:imeActionId="@+id/login"
-                    android:background="@drawable/fields_login_screen"
+                    android:background="@drawable/fields_login_api"
                     android:imeActionLabel="@string/action_sign_in_short"
                     android:imeOptions="actionUnspecified"
                     android:inputType="textPassword"
@@ -53,16 +54,22 @@
                     android:background="@drawable/buttons_login_api"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
                     android:text="@string/action_sign_in"
                     android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="277dp"
+                    android:layout_height="57dp"
+                    android:text="If you don't got any account yet, don't worry! Just tap the button below to register."
+                    android:id="@+id/textView4"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="100dp" />
 
                 <Button android:id="@+id/register_button"
                     style="@style/buttons_login_screen"
                     android:background="@drawable/buttons_login_api"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
                     android:text="@string/action_register"
                     android:textStyle="bold" />
 

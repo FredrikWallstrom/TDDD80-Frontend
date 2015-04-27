@@ -1,15 +1,18 @@
 package com.example.frewa814.livekrubb.flow;
 
+import android.app.Activity;
 import android.app.ListFragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.example.frewa814.livekrubb.asynctask.GetTask;
 import com.example.frewa814.livekrubb.activity.MainActivity;
 import com.example.frewa814.livekrubb.R;
+import com.example.frewa814.livekrubb.recipebank.OnButtonClickedListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -36,13 +39,28 @@ public class FlowFragment extends ListFragment {
 
     public static JSONArray posts;
     private ArrayList myList;
+    OnButtonClickedListener mListener;
 
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            mListener = (OnButtonClickedListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString() + " must implement OnButtonClickedListener ");
+        }
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.flow_list, container, false);
+
+        // Set button listener for the share recipe button.
+        Button postRecipeButton = (Button) rootView.findViewById(R.id.share_recipe_button);
+        postRecipeButton.setOnClickListener(clickListener);
+
         return rootView;
     }
 
@@ -204,6 +222,15 @@ public class FlowFragment extends ListFragment {
         }
 
     }
+
+    // When a button is clicked, notify the activity.
+    // MainActivity will then create the new fragment.
+    View.OnClickListener clickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            mListener.onButtonClicked(view);
+        }
+    };
 }
 
 

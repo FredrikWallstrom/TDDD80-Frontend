@@ -12,13 +12,10 @@
     <string name="error_invalid_email">This email address is invalid</string>
     <string name="error_invalid_password">This password is too short or contains a space!</string>
     <string name="error_invalid_username">This Username is to short or contains space!</string>
-    <string name="error_invalid__short_username">This Username is too short</string>
     <string name="error_incorrect_password">This password is incorrect</string>
-    <string name="error_incorrect_email">Wrong email!</string>
-    <string name="error_field_required">This field is required</string>
+    <string name="error_incorrect_username">Wrong Username!</string>
     <string name="error_username_exists">Username already exists!</string>
     <string name="error_email_exists">Email already exists!</string>
-    <string name="error_remove_space">Space is not allowed here!</string>
 
 
 </resources>
