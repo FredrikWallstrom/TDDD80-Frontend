@@ -1,14 +1,92 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent">
 
-    <TextView
+    <!-- Share progress -->
+    <ProgressBar
+        android:id="@+id/share_progress"
+        style="?android:attr/progressBarStyleLarge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:text="Share Recipe"
-        android:id="@+id/textView2" />
+        android:layout_alignParentTop="true"
+        android:layout_marginBottom="8dp"
+        android:visibility="gone" />
+
+    <ScrollView
+        android:id="@+id/share_recipe_form"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="false">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/back_from_share_recipe"
+                    android:layout_width="50dp"
+                    android:layout_height="60dp"
+                    android:contentDescription="TODO"
+                    android:src="@drawable/ic_backbutton"
+                    android:layout_marginRight="130dp" />
+
+                <Button
+                    android:id="@+id/share_recipe_button"
+                    android:layout_width="175dp"
+                    android:layout_height="60dp"
+                    android:background="@drawable/share_recipe_button"
+                    android:shadowColor="#30ACFF"
+                    android:shadowDx="0"
+                    android:shadowDy="0"
+                    android:shadowRadius="5"
+                    android:text="Share"
+                    android:textColor="#545454"
+                    android:textSize="32sp"
+                    android:layout_marginTop="5dp" />
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:weightSum="1">
+
+
+                <TextView
+                    android:id="@+id/recipe_name_field_share_recipe"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="25dp"
+                    android:layout_marginTop="25dp"
+                    android:text="No recipe added. Tap the button below!"
+                    android:textSize="19sp" />
+
+                <EditText
+                    android:id="@+id/post_information_share_recipe"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:hint="Tell your followers how awesome your recipe is here!" />
+
+                <Button
+                    android:id="@+id/add_recipe_button"
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/add_recipe_button"
+                    android:text="Add Recipe"
+                    android:textColor="#545454" />
+
+
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
 
 </RelativeLayout>

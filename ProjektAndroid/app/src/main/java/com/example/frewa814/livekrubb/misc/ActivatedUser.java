@@ -11,11 +11,14 @@ public class ActivatedUser {
 
     private static final String PROFILE_PICTURE_TAG = "profile_picture";
     private static final String USERNAME_TAG = "username";
+    private static final String ID_TAG = "id";
     public static String activatedProfilePicture;
     public static String activatedUsername;
+    public static String activatedUserID;
 
     public ActivatedUser(JSONObject jsonObject) {
         try {
+            activatedUserID = jsonObject.getString(ID_TAG);
             activatedProfilePicture = jsonObject.getString(PROFILE_PICTURE_TAG);
             activatedUsername = jsonObject.getString(USERNAME_TAG);
         } catch (JSONException e) {

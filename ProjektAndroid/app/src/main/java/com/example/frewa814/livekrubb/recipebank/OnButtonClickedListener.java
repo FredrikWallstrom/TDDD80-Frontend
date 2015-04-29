@@ -8,4 +8,6 @@ import android.view.View;
  */
 public interface OnButtonClickedListener {
     public void onButtonClicked(View view);
+    public void passRecipeData(String name, String information);
+    public void onTaskDone();
 }

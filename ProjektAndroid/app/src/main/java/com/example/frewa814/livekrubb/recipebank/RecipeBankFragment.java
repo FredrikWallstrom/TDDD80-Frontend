@@ -12,7 +12,7 @@ import com.example.frewa814.livekrubb.R;
 /**
  * Created by Fredrik on 2015-04-24.
  */
-public class RecipeFragment extends Fragment {
+public class RecipeBankFragment extends Fragment {
 
     OnButtonClickedListener mListener;
 
@@ -46,6 +46,7 @@ public class RecipeFragment extends Fragment {
     View.OnClickListener clickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
+
             mListener.onButtonClicked(view);
         }
     };

@@ -17,15 +17,18 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.SearchView;
+import android.widget.Toast;
 
 import com.example.frewa814.livekrubb.R;
 import com.example.frewa814.livekrubb.asynctask.GetTask;
+import com.example.frewa814.livekrubb.flow.CreateRecipeFragment;
 import com.example.frewa814.livekrubb.flow.FlowFragment;
 import com.example.frewa814.livekrubb.flow.ShareRecipeFragment;
 import com.example.frewa814.livekrubb.mypage.MyPageFragment;
 import com.example.frewa814.livekrubb.recipebank.OnButtonClickedListener;
-import com.example.frewa814.livekrubb.recipebank.RecipeFragment;
+import com.example.frewa814.livekrubb.recipebank.RecipeBankFragment;
 import com.example.frewa814.livekrubb.recipebank.ToplistFragment;
 
 import org.json.JSONArray;
@@ -131,7 +134,7 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
             case R.id.action_recipe_bank:
                 fm = getFragmentManager();
                 ft = fm.beginTransaction();
-                RecipeFragment recipeBankFragment = new RecipeFragment();
+                RecipeBankFragment recipeBankFragment = new RecipeBankFragment();
                 ft.replace(R.id.fragment_container, recipeBankFragment);
                 ft.commit();
                 break;
@@ -163,9 +166,9 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
                     ft.commit();
                 }
                 // Check if the activated fragment was the RecipeFragment.
-                if (oldFragment instanceof RecipeFragment) {
+                if (oldFragment instanceof RecipeBankFragment) {
                     // Replace the old FlowFragment with a new one, my type of updating a fragment.
-                    RecipeFragment updatedRecipeBankFragment = new RecipeFragment();
+                    RecipeBankFragment updatedRecipeBankFragment = new RecipeBankFragment();
                     ft.replace(R.id.fragment_container, updatedRecipeBankFragment);
                     ft.commit();
                 }
@@ -269,24 +272,96 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
                 ft.commit();
                 break;
             case R.id.recipe_bank_button:
-                RecipeFragment recipeFragment = new RecipeFragment();
+                RecipeBankFragment recipeFragment = new RecipeBankFragment();
                 ft.replace(R.id.fragment_container, recipeFragment);
                 ft.commit();
+                break;
+            case R.id.back_from_create_recipe:
             case R.id.share_recipe_button:
+
+                // Change to ShareRecipeFragment if we go from FlowFragment or CreateRecipeFragment.
                 ShareRecipeFragment shareRecipeFragment = new ShareRecipeFragment();
                 ft.replace(R.id.fragment_container, shareRecipeFragment);
-                ft.addToBackStack(null);
                 ft.commit();
+                break;
+            case R.id.back_from_share_recipe:
+                // Show the actionbar.
+                ActionBar actionBar = this.getActionBar();
+                if (actionBar != null) {
+                    actionBar.show();
+                }
+                // Change to FlowFragment.
+                FlowFragment flowFragment = new FlowFragment();
+                ft.replace(R.id.fragment_container, flowFragment);
+                ft.commit();
+                break;
+            case R.id.add_recipe_button:
+                CreateRecipeFragment createRecipeFragment = new CreateRecipeFragment();
+                ft.replace(R.id.fragment_container, createRecipeFragment);
+                ft.commit();
+                break;
+            case R.id.confirm_recipe_button:
+
         }
     }
 
     @Override
-    public void onBackPressed() {
+    public void passRecipeData(String name, String information) {
+        if (name == null || name.isEmpty() || name.trim().isEmpty()){
+            // TODO alert user a task or something that he entered wrong input in the name view.
+        }else if (information == null || information.isEmpty() || information.trim().isEmpty()){
+            //TODO alert user a task or something that he entered wrong input in the information view.
+        }else{
+            ShareRecipeFragment shareRecipeFragment = new ShareRecipeFragment();
+            Bundle bundle = new Bundle();
+            bundle.putString("name", name);
+            bundle.putString("information", information);
+            shareRecipeFragment.setArguments(bundle);
+            getFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container,shareRecipeFragment)
+                    .commit();
+        }
+
+    }
+
+
+
+    @Override
+    public void onTaskDone() {
+        // Show the actionbar.
         ActionBar actionBar = this.getActionBar();
         if (actionBar != null) {
             actionBar.show();
         }
-        super.onBackPressed();
+
+        FragmentManager fm = getFragmentManager();
+        FragmentTransaction ft = fm.beginTransaction();
+        FlowFragment flowFragment = new FlowFragment();
+        ft.replace(R.id.fragment_container, flowFragment);
+        ft.commit();
+    }
+
+    @Override
+    public void onBackPressed() {
+        FragmentManager fm = getFragmentManager();
+        FragmentTransaction ft = fm.beginTransaction();
+
+        // Get current fragment.
+        Fragment fragment = this.getFragmentManager().findFragmentById(R.id.fragment_container);
+        if (fragment instanceof ShareRecipeFragment || fragment instanceof CreateRecipeFragment){
+            ActionBar actionBar = this.getActionBar();
+            if (actionBar != null) {
+                actionBar.show();
+            }
+            FlowFragment flowFragment = new FlowFragment();
+            ft.replace(R.id.fragment_container, flowFragment);
+            ft.commit();
+
+        }
+        else{
+            super.onBackPressed();
+        }
+
 
     }
 }
