@@ -185,6 +185,9 @@ public class RegisterActivity extends Activity {
         }
     }
 
+    /**
+     * Do a http request and make a post to the database with the user information.
+     */
     public String makePost(String url) {
         InputStream inputStream;
         String result;
@@ -240,6 +243,10 @@ public class RegisterActivity extends Activity {
         return result;
     }
 
+    /**
+     * Private anonymous class that will do one asyncTask so we can handle the http requoest
+     * and add the user to the database.
+     */
     private class UserRegisterTask extends AsyncTask<Void, Void, String> {
 
         UserRegisterTask(String username, String email, String password) {
@@ -263,6 +270,7 @@ public class RegisterActivity extends Activity {
             String dict = makePost(MainActivity.URL + "/add_user");
 
             try {
+                // Get the result from the database and check if something went wrong.
                 JSONObject jsonObject = new JSONObject(dict);
                 result = jsonObject.getString(RESULT_TAG);
             } catch (JSONException e) {

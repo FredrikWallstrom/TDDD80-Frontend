@@ -17,19 +17,18 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.SearchView;
-import android.widget.Toast;
 
 import com.example.frewa814.livekrubb.R;
 import com.example.frewa814.livekrubb.asynctask.GetTask;
-import com.example.frewa814.livekrubb.flow.CreateRecipeFragment;
+import com.example.frewa814.livekrubb.comment.CommentFragment;
 import com.example.frewa814.livekrubb.flow.FlowFragment;
-import com.example.frewa814.livekrubb.flow.ShareRecipeFragment;
+import com.example.frewa814.livekrubb.recipe.ShareRecipeFragment;
+import com.example.frewa814.livekrubb.recipe.ShowRecipeFragment;
 import com.example.frewa814.livekrubb.mypage.MyPageFragment;
-import com.example.frewa814.livekrubb.recipebank.OnButtonClickedListener;
-import com.example.frewa814.livekrubb.recipebank.RecipeBankFragment;
-import com.example.frewa814.livekrubb.recipebank.ToplistFragment;
+import com.example.frewa814.livekrubb.misc.OnButtonClickedListener;
+import com.example.frewa814.livekrubb.recipe.RecipeBankFragment;
+import com.example.frewa814.livekrubb.recipe.TopListFragment;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -90,6 +89,7 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
                     // TODO Här ska det ändras ifall användaren trycker på sök knappen så ska alla namn som ligger i listan skrivas ut.
                     return true;
                 }
+
                 @Override
                 public boolean onQueryTextChange(String query) {
                     loadHistory(query);
@@ -102,12 +102,11 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        FragmentManager fm;
-        FragmentTransaction ft;
+        FragmentManager fm = getFragmentManager();
+        FragmentTransaction ft = fm.beginTransaction();
 
         // Handle action bar item clicks.
         switch (item.getItemId()) {
-
             // Case Refresh button.
             case R.id.action_refresh:
                 refreshFragment(item);
@@ -123,8 +122,6 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
 
             // Case My page button.
             case R.id.action_my_page:
-                fm = getFragmentManager();
-                ft = fm.beginTransaction();
                 MyPageFragment myPageFragment = new MyPageFragment();
                 ft.replace(R.id.fragment_container, myPageFragment);
                 ft.commit();
@@ -132,10 +129,15 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
 
             // Case Recipe bank button.
             case R.id.action_recipe_bank:
-                fm = getFragmentManager();
-                ft = fm.beginTransaction();
                 RecipeBankFragment recipeBankFragment = new RecipeBankFragment();
                 ft.replace(R.id.fragment_container, recipeBankFragment);
+                ft.commit();
+                break;
+
+            // Case Flow list button. Change to FlowFragment.
+            case R.id.action_flow:
+                FlowFragment flowFragment = new FlowFragment();
+                ft.replace(R.id.fragment_container, flowFragment);
                 ft.commit();
                 break;
         }
@@ -180,7 +182,9 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
         }, WAIT_TIME);
     }
 
-    // History
+    /**
+     * Load the dropdown menu with the names that fit the query input.
+     */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     private void loadHistory(String query) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
@@ -200,7 +204,7 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
             SearchManager manager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
             final SearchView search = (SearchView) menu.findItem(R.id.action_search).getActionView();
             search.setSuggestionsAdapter(new SearchUserAdapter(this, cursor, items));
-            search.setOnSuggestionListener(new SearchView.OnSuggestionListener(){
+            search.setOnSuggestionListener(new SearchView.OnSuggestionListener() {
 
                 @Override
                 public boolean onSuggestionSelect(int position) {
@@ -258,6 +262,7 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
     /**
      * Handle the buttons click from recipe bank fragment and toplist fragment to display the right fragment.
      * It's like tabs.
+     *
      * @param view got the information on which fragment there is to display.
      */
     @Override
@@ -265,10 +270,10 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
         FragmentManager fm = getFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
         // Switch to replace the fragment with the right one.
-        switch (view.getId()){
+        switch (view.getId()) {
             case R.id.toplist_button:
-                ToplistFragment toplistFragment = new ToplistFragment();
-                ft.replace(R.id.fragment_container, toplistFragment);
+                TopListFragment topListFragment = new TopListFragment();
+                ft.replace(R.id.fragment_container, topListFragment);
                 ft.commit();
                 break;
             case R.id.recipe_bank_button:
@@ -276,15 +281,23 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
                 ft.replace(R.id.fragment_container, recipeFragment);
                 ft.commit();
                 break;
-            case R.id.back_from_create_recipe:
             case R.id.share_recipe_button:
-
                 // Change to ShareRecipeFragment if we go from FlowFragment or CreateRecipeFragment.
                 ShareRecipeFragment shareRecipeFragment = new ShareRecipeFragment();
                 ft.replace(R.id.fragment_container, shareRecipeFragment);
+                ft.addToBackStack(null);
+                ft.commit();
+                break;
+            case R.id.back_from_show_recipe:
+                onBackPressed();
+                break;
+            case R.id.comment:
+                CommentFragment commentFragment = new CommentFragment();
+                ft.replace(R.id.fragment_container, commentFragment);
                 ft.commit();
                 break;
             case R.id.back_from_share_recipe:
+            case R.id.back_from_comment:
                 // Show the actionbar.
                 ActionBar actionBar = this.getActionBar();
                 if (actionBar != null) {
@@ -293,37 +306,11 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
                 // Change to FlowFragment.
                 FlowFragment flowFragment = new FlowFragment();
                 ft.replace(R.id.fragment_container, flowFragment);
+                fm.popBackStack();
                 ft.commit();
                 break;
-            case R.id.add_recipe_button:
-                CreateRecipeFragment createRecipeFragment = new CreateRecipeFragment();
-                ft.replace(R.id.fragment_container, createRecipeFragment);
-                ft.commit();
-                break;
-            case R.id.confirm_recipe_button:
-
         }
     }
-
-    @Override
-    public void passRecipeData(String name, String information) {
-        if (name == null || name.isEmpty() || name.trim().isEmpty()){
-            // TODO alert user a task or something that he entered wrong input in the name view.
-        }else if (information == null || information.isEmpty() || information.trim().isEmpty()){
-            //TODO alert user a task or something that he entered wrong input in the information view.
-        }else{
-            ShareRecipeFragment shareRecipeFragment = new ShareRecipeFragment();
-            Bundle bundle = new Bundle();
-            bundle.putString("name", name);
-            bundle.putString("information", information);
-            shareRecipeFragment.setArguments(bundle);
-            getFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container,shareRecipeFragment)
-                    .commit();
-        }
-
-    }
-
 
 
     @Override
@@ -342,25 +329,55 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
     }
 
     @Override
-    public void onBackPressed() {
+    public void onShowRecipeButtonClicked(JSONObject recipe) {
         FragmentManager fm = getFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
 
-        // Get current fragment.
-        Fragment fragment = this.getFragmentManager().findFragmentById(R.id.fragment_container);
-        if (fragment instanceof ShareRecipeFragment || fragment instanceof CreateRecipeFragment){
-            ActionBar actionBar = this.getActionBar();
-            if (actionBar != null) {
-                actionBar.show();
-            }
+        Bundle details = new Bundle();
+        String recipeString = recipe.toString();
+        details.putString("recipe", recipeString);
+
+        ShowRecipeFragment showRecipeFragment = new ShowRecipeFragment();
+        ft.replace(R.id.fragment_container, showRecipeFragment);
+        showRecipeFragment.setArguments(details);
+        ft.addToBackStack(null);
+        ft.commit();
+    }
+
+    @Override
+    public void onCommentButtonClicked(String postId) {
+        FragmentManager fm = getFragmentManager();
+        FragmentTransaction ft = fm.beginTransaction();
+
+        Bundle bundle = new Bundle();
+        bundle.putString("post_id", postId);
+
+        CommentFragment commentFragment = new CommentFragment();
+        ft.replace(R.id.fragment_container, commentFragment);
+        commentFragment.setArguments(bundle);
+        ft.commit();
+    }
+
+    @Override
+    public void onBackPressed() {
+        ActionBar actionBar = this.getActionBar();
+        if (actionBar != null) {
+            actionBar.show();
+        }
+
+        Fragment currentFragment = this.getFragmentManager().findFragmentById(R.id.fragment_container);
+        if (currentFragment instanceof CommentFragment){
+            FragmentManager fm = getFragmentManager();
+            FragmentTransaction ft = fm.beginTransaction();
             FlowFragment flowFragment = new FlowFragment();
             ft.replace(R.id.fragment_container, flowFragment);
             ft.commit();
-
         }
         else{
             super.onBackPressed();
         }
+
+
 
 
     }

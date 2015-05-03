@@ -15,6 +15,7 @@ import com.example.frewa814.livekrubb.misc.AutoResizeTextView;
 import com.example.frewa814.livekrubb.asynctask.GetTask;
 import com.example.frewa814.livekrubb.activity.MainActivity;
 import com.example.frewa814.livekrubb.R;
+import com.example.frewa814.livekrubb.misc.OnButtonClickedListener;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -43,13 +44,23 @@ public class FlowListAdapter extends BaseAdapter {
     private ArrayList myList = new ArrayList();
     private LayoutInflater inflater;
     private String mActivatedPerson = ActivatedUser.activatedUsername;
+    OnButtonClickedListener mListener;
 
 
     public FlowListAdapter(Context cont, ArrayList myList) {
         this.myList = myList;
         Context context = cont;
         inflater = LayoutInflater.from(context);
+
+        try {
+            mListener = (OnButtonClickedListener) cont;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(cont.toString() + " must implement OnButtonClickedListener ");
+        }
     }
+
+
+
 
     @Override
     public int getCount() {
@@ -79,9 +90,10 @@ public class FlowListAdapter extends BaseAdapter {
 
             // Set up the ViewHolder one time.
             mViewHolder.postAuthorView = (TextView) convertView.findViewById(R.id.post_author);
-            mViewHolder.recipeButton = (Button) convertView.findViewById(R.id.recipe_button);
+            mViewHolder.recipeButton = (Button) convertView.findViewById(R.id.recipe_button_flow_list);
             mViewHolder.postInformationView = (AutoResizeTextView) convertView.findViewById(R.id.post_information);
             mViewHolder.likeButton = (Button) convertView.findViewById(R.id.like_button);
+            mViewHolder.commentButton = (Button) convertView.findViewById(R.id.comment_button);
             mViewHolder.displayLikesView = (TextView) convertView.findViewById(R.id.likes_count);
             mViewHolder.displayCommentsView = (TextView) convertView.findViewById(R.id.comments_count);
 
@@ -160,6 +172,45 @@ public class FlowListAdapter extends BaseAdapter {
                 }
             }
         });
+
+        mViewHolder.recipeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                View parentRow = (View) v.getParent();
+                ListView listView = (ListView) parentRow.getParent();
+                int position = listView.getPositionForView(parentRow);
+
+                JSONObject recipe = null;
+
+                try {
+                    recipe = (JSONObject) FlowFragment.posts.get(position);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                mListener.onShowRecipeButtonClicked(recipe);
+            }
+        });
+
+        mViewHolder.commentButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                View parentRow = (View) v.getParent();
+                ListView listView = (ListView) parentRow.getParent();
+                int position = listView.getPositionForView(parentRow);
+
+                String postId = null;
+
+                try {
+                    JSONObject post = (JSONObject) FlowFragment.posts.get(position);
+                    postId = post.getString("id");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                mListener.onCommentButtonClicked(postId);
+            }
+        });
         return convertView;
     }
 
@@ -200,7 +251,7 @@ public class FlowListAdapter extends BaseAdapter {
      */
     private static class MyViewHolder {
         TextView postAuthorView, postInformationView, displayCommentsView, displayLikesView;
-        Button recipeButton, likeButton;
+        Button recipeButton, likeButton, commentButton;
     }
 
     /**

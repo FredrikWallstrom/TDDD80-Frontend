@@ -302,6 +302,9 @@ public class LoginActivity extends Activity {
         }
     }
 
+    /**
+     * This method will do one http request and get the user from the database.
+     */
     private String getUser(String username) {
         InputStream inputStream;
         String result;
@@ -322,6 +325,9 @@ public class LoginActivity extends Activity {
         return result;
     }
 
+    /**
+     * Convert the inputstream to a readable string.
+     */
     private String convertInputStreamToString(InputStream inputStream) throws IOException {
         BufferedReader bufferedReader = new BufferedReader( new InputStreamReader(inputStream));
         String line;

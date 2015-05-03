@@ -12,7 +12,7 @@ import android.widget.Toast;
 import com.example.frewa814.livekrubb.asynctask.GetTask;
 import com.example.frewa814.livekrubb.activity.MainActivity;
 import com.example.frewa814.livekrubb.R;
-import com.example.frewa814.livekrubb.recipebank.OnButtonClickedListener;
+import com.example.frewa814.livekrubb.misc.OnButtonClickedListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -65,7 +65,7 @@ public class FlowFragment extends ListFragment {
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
+     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
         // Get all posts in the database that's gonna represent the flow.
@@ -106,8 +106,8 @@ public class FlowFragment extends ListFragment {
                     }
 
                 } else {
-                    Toast serverError = Toast.makeText(getActivity(), "Your flow is empty. Search some friends and follow them!", Toast.LENGTH_LONG);
-                    serverError.show();
+                    Toast Error = Toast.makeText(getActivity(), "Your flow is empty. Search some friends and follow them!", Toast.LENGTH_LONG);
+                    Error.show();
                 }
             } else {
                 Toast serverError = Toast.makeText(getActivity(), "Failed to update, Try again!", Toast.LENGTH_LONG);
