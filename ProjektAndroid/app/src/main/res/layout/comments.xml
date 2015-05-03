@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:weightSum="1"
+        android:layout_alignParentEnd="true"
+        android:layout_above="@+id/linearLayout"
+        android:layout_alignParentTop="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="1">
+
+            <ImageView
+                android:id="@+id/back_from_comment"
+                android:layout_width="50dp"
+                android:layout_height="60dp"
+                android:contentDescription="TODO"
+                android:src="@drawable/ic_backbutton" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent"
+                style="@style/text_view_share_recipe"
+                android:text="Comments"
+                android:id="@+id/recipe_name_show_recipe" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:weightSum="1"
+            android:background="@android:color/darker_gray">
+
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="1dp"
+                android:background="@android:color/black" />
+
+            <ListView
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:id="@android:id/list"
+                android:background="@android:color/background_light"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="15dp"
+                android:divider="@android:color/darker_gray"
+                android:dividerHeight="15.0sp"
+                android:scrollbars="none"
+                android:layout_weight="12.60"
+                android:layout_marginBottom="15dp" />
+
+        </LinearLayout>
+
+        <ScrollView
+            android:id="@+id/share_recipe_form"
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent"
+            android:fillViewport="false" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="65dp"
+        android:layout_gravity="bottom"
+        android:orientation="horizontal"
+        android:weightSum="66"
+        android:gravity="bottom"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="false"
+        android:layout_alignParentStart="false"
+        android:id="@+id/linearLayout">
+
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add"
+            android:id="@+id/comment"
+            android:layout_gravity="bottom" />
+
+        <EditText
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/comment_edit_text_view"
+            android:hint="Your comment."
+            android:layout_gravity="bottom" />
+    </LinearLayout>
+
+</RelativeLayout>

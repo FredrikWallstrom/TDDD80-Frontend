@@ -1,32 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent"
+    android:weightSum="2">
 
-    <TextView
+    <LinearLayout
+        android:id="@+id/linearLayout3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/recipe_bank_button"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            android:text="Bank" />
+
+        <Button
+            android:id="@+id/toplist_button"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            android:text="Toplist" />
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:id="@+id/linearLayout4">
+
+        <SearchView
+            android:layout_width="wrap_content"
+            android:background="@android:drawable/button_onoff_indicator_on"
+            android:queryHint="Search recipe"
+            android:layout_height="wrap_content"
+            android:id="@+id/searchView_recipe_bank" />
+    </LinearLayout>
+
+    <ListView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:id="@android:id/list"
+        android:layout_above="@+id/linearLayout4"
         android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:text="Recipe Bank"
-        android:id="@+id/textView2" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Toplist"
-        android:id="@+id/toplist_button"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:layout_toEndOf="@+id/textView2" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Bank"
-        android:id="@+id/recipe_bank_button"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true"
-        android:layout_toStartOf="@+id/textView2" />
+        android:layout_below="@+id/linearLayout3" />
 
 </RelativeLayout>
