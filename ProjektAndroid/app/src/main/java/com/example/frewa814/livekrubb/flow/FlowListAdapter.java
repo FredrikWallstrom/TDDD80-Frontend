@@ -211,6 +211,26 @@ public class FlowListAdapter extends BaseAdapter {
                 mListener.onCommentButtonClicked(postId);
             }
         });
+
+        mViewHolder.postAuthorView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                View parentRow = (View) v.getParent();
+                ListView listView = (ListView) parentRow.getParent();
+                int position = listView.getPositionForView(parentRow);
+
+                String userId = null;
+
+                try {
+                    JSONObject post = (JSONObject) FlowFragment.posts.get(position);
+                    userId = post.getString("user_id");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                mListener.onMyPageClicked(userId);
+            }
+        });
         return convertView;
     }
 

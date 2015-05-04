@@ -156,6 +156,7 @@ public class ShareRecipeFragment extends Fragment {
                     mRecipeNameView.requestFocus();
                 }
             }else{
+                hideKeyboard();
                 mListener.onButtonClicked(view);
             }
         }

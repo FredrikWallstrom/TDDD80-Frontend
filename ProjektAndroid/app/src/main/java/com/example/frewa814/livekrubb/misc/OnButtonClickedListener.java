@@ -13,4 +13,5 @@ public interface OnButtonClickedListener {
     public void onTaskDone();
     public void onShowRecipeButtonClicked(JSONObject recipe);
     public void onCommentButtonClicked(String postId);
+    public void onMyPageClicked(String user_id);
 }

@@ -17,12 +17,14 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.SearchView;
 
 import com.example.frewa814.livekrubb.R;
 import com.example.frewa814.livekrubb.asynctask.GetTask;
 import com.example.frewa814.livekrubb.comment.CommentFragment;
 import com.example.frewa814.livekrubb.flow.FlowFragment;
+import com.example.frewa814.livekrubb.misc.ActivatedUser;
 import com.example.frewa814.livekrubb.recipe.ShareRecipeFragment;
 import com.example.frewa814.livekrubb.recipe.ShowRecipeFragment;
 import com.example.frewa814.livekrubb.mypage.MyPageFragment;
@@ -44,9 +46,11 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
     public final static String URL = "http://livekrubb-frewa814.openshift.ida.liu.se";
     private static final String USER_TAG = "users";
     private static final String USERNAME_TAG = "username";
+    private static final String ID_TAG = "id";
     private MenuItem menuItem;
     private static final int WAIT_TIME = 2500;
     private Menu menu;
+    private JSONArray allUsersOnQuery = null;
 
 
     @Override
@@ -86,7 +90,21 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
 
                 @Override
                 public boolean onQueryTextSubmit(String query) {
-                    // TODO Här ska det ändras ifall användaren trycker på sök knappen så ska alla namn som ligger i listan skrivas ut.
+                    String user_id = null;
+
+                    if (allUsersOnQuery != null){
+                        try {
+                            JSONObject jsonObject = allUsersOnQuery.getJSONObject(0);
+                            user_id = jsonObject.getString(ID_TAG);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        if (user_id != null){
+                            hideKeyboard();
+                            onMyPageClicked(user_id);
+                        }
+                        return true;
+                    }
                     return true;
                 }
 
@@ -122,9 +140,7 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
 
             // Case My page button.
             case R.id.action_my_page:
-                MyPageFragment myPageFragment = new MyPageFragment();
-                ft.replace(R.id.fragment_container, myPageFragment);
-                ft.commit();
+                onMyPageClicked(ActivatedUser.activatedUserID);
                 break;
 
             // Case Recipe bank button.
@@ -213,7 +229,21 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
 
                 @Override
                 public boolean onSuggestionClick(int position) {
-                    // TODO Här kommer clicket i sökning in, har ska vi hämta vem som är tryckt och därefetr byta till hans profilsida.
+                    String user_id = null;
+
+                    if (allUsersOnQuery != null){
+                        try {
+                            JSONObject jsonObject = allUsersOnQuery.getJSONObject(position);
+                            user_id = jsonObject.getString(ID_TAG);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        if (user_id != null){
+                            hideKeyboard();
+                            onMyPageClicked(user_id);
+                        }
+                        return true;
+                    }
                     return false;
                 }
             });
@@ -222,11 +252,15 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
         }
     }
 
+    private void hideKeyboard() {
+        final InputMethodManager imm = (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+    }
+
     private List getAllUsers(String query) {
         String allUsers;
         JSONObject jsonObject;
-        JSONArray jsonArray = null;
-        List<String> items = new ArrayList<>();
+        List<String> searchedUserNames = new ArrayList<>();
         try {
             allUsers = new GetTask().execute(MainActivity.URL + "/all_users").get();
         } catch (InterruptedException | ExecutionException e) {
@@ -236,26 +270,26 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
         if (!allUsers.equals("server error")) {
             try {
                 jsonObject = new JSONObject(allUsers);
-                jsonArray = jsonObject.getJSONArray(USER_TAG);
+                allUsersOnQuery = jsonObject.getJSONArray(USER_TAG);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
-        if (jsonArray != null) {
+        if (allUsersOnQuery != null) {
             // Check if the one of the likerS is the activated person.
-            for (int e = 0; e < jsonArray.length(); e++) {
+            for (int e = 0; e < allUsersOnQuery.length(); e++) {
                 try {
-                    jsonObject = jsonArray.getJSONObject(e);
+                    jsonObject = allUsersOnQuery.getJSONObject(e);
                     String username = jsonObject.getString(USERNAME_TAG);
                     if (username.toLowerCase().contains(query.toLowerCase())) {
-                        items.add(username);
+                        searchedUserNames.add(username);
                     }
                 } catch (JSONException e1) {
                     e1.printStackTrace();
                 }
             }
         }
-        return items;
+        return searchedUserNames;
     }
 
 
@@ -289,6 +323,7 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
                 ft.commit();
                 break;
             case R.id.back_from_show_recipe:
+            case R.id.back_from_comment:
                 onBackPressed();
                 break;
             case R.id.comment:
@@ -297,7 +332,6 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
                 ft.commit();
                 break;
             case R.id.back_from_share_recipe:
-            case R.id.back_from_comment:
                 // Show the actionbar.
                 ActionBar actionBar = this.getActionBar();
                 if (actionBar != null) {
@@ -355,7 +389,23 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
         CommentFragment commentFragment = new CommentFragment();
         ft.replace(R.id.fragment_container, commentFragment);
         commentFragment.setArguments(bundle);
+        ft.addToBackStack(null);
         ft.commit();
+    }
+
+    @Override
+    public void onMyPageClicked(String user_id) {
+        FragmentManager fm = getFragmentManager();
+        FragmentTransaction ft = fm.beginTransaction();
+
+        Bundle bundle = new Bundle();
+        bundle.putString("user_id", user_id);
+
+        MyPageFragment myPageFragment = new MyPageFragment();
+        ft.replace(R.id.fragment_container, myPageFragment);
+        myPageFragment.setArguments(bundle);
+        ft.commit();
+
     }
 
     @Override
@@ -364,22 +414,7 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
         if (actionBar != null) {
             actionBar.show();
         }
-
-        Fragment currentFragment = this.getFragmentManager().findFragmentById(R.id.fragment_container);
-        if (currentFragment instanceof CommentFragment){
-            FragmentManager fm = getFragmentManager();
-            FragmentTransaction ft = fm.beginTransaction();
-            FlowFragment flowFragment = new FlowFragment();
-            ft.replace(R.id.fragment_container, flowFragment);
-            ft.commit();
-        }
-        else{
-            super.onBackPressed();
-        }
-
-
-
-
+        super.onBackPressed();
     }
 }
 
