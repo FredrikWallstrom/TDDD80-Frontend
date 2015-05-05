@@ -126,8 +126,11 @@ public class RecipeBankFragment extends ListFragment implements AdapterView.OnIt
     }
 
     private void hideKeyboard() {
-        final InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(getView().getWindowToken(), 0);
+        View view = getActivity().getCurrentFocus();
+        if (view != null) {
+            InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+            inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+        }
     }
 
     private void updateListView(String newText) {

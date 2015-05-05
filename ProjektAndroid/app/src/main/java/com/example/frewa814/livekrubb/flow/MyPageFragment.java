@@ -1,10 +1,13 @@
 package com.example.frewa814.livekrubb.flow;
 
+import android.app.Activity;
 import android.app.ListFragment;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -17,6 +20,7 @@ import com.example.frewa814.livekrubb.flow.PublicFlowFragment;
 import com.example.frewa814.livekrubb.flow.FlowListAdapter;
 import com.example.frewa814.livekrubb.flow.FlowListData;
 import com.example.frewa814.livekrubb.misc.ActivatedUser;
+import com.example.frewa814.livekrubb.misc.OnButtonClickedListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -42,6 +46,13 @@ public class MyPageFragment extends ListFragment {
     private static final String ID_TAG = "id";
     private TextView nameView;
     private Button followButton;
+
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -247,6 +258,14 @@ public class MyPageFragment extends ListFragment {
             }
         }
     };
+
+    private void hideKeyboard() {
+        View view = getActivity().getCurrentFocus();
+        if (view != null) {
+            InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+            inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+        }
+    }
 }
 
 

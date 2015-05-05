@@ -51,13 +51,18 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
     private MenuItem menuItem;
     private static final int WAIT_TIME = 2500;
     private Menu menu;
-    private JSONArray allUsersOnQuery = null;
+    private JSONArray allUsers;
+    private MenuItem mSearchMenuItem;
+
+
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        allUsers = getAllUsers();
 
         // Check that the activity is using the layout version with
         // the fragment_container FrameLayout
@@ -81,32 +86,48 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
 
+            mSearchMenuItem = menu.findItem(R.id.action_search);
+
             SearchManager manager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-
-            SearchView search = (SearchView) menu.findItem(R.id.action_search).getActionView();
-
+            final SearchView search = (SearchView) menu.findItem(R.id.action_search).getActionView();
             search.setSearchableInfo(manager.getSearchableInfo(getComponentName()));
-
             search.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 
                 @Override
                 public boolean onQueryTextSubmit(String query) {
                     String user_id = null;
+                    List<JSONObject> searchedUserNames = new ArrayList<>();
 
-                    if (allUsersOnQuery != null){
-                        try {
-                            JSONObject jsonObject = allUsersOnQuery.getJSONObject(0);
-                            user_id = jsonObject.getString(ID_TAG);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
+                    hideKeyboard();
+                    mSearchMenuItem.collapseActionView();
+
+                    if (allUsers != null) {
+                        // Check if the one of the liker is the activated person.
+                        for (int i = 0; i < allUsers.length(); i++) {
+                            try {
+                                JSONObject jsonObject = allUsers.getJSONObject(i);
+                                String username = jsonObject.getString(USERNAME_TAG);
+                                if (username.toLowerCase().contains(query.toLowerCase())) {
+                                    searchedUserNames.add(jsonObject);
+                                }
+                            } catch (JSONException e1) {
+                                e1.printStackTrace();
+                            }
                         }
-                        if (user_id != null){
-                            hideKeyboard();
-                            onMyPageClicked(user_id);
-                        }
+                    }
+
+                    try {
+                        JSONObject jsonObject = searchedUserNames.get(0);
+                        user_id = jsonObject.getString(ID_TAG);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    if (user_id != null) {
+                        onMyPageClicked(user_id);
                         return true;
                     }
-                    return true;
+
+                    return false;
                 }
 
                 @Override
@@ -125,6 +146,9 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
         FragmentTransaction ft = fm.beginTransaction();
 
         // Handle action bar item clicks.
+
+        hideKeyboard();
+
         switch (item.getItemId()) {
             // Case Refresh button.
             case R.id.action_refresh:
@@ -183,6 +207,12 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
 
                 Fragment oldFragment = getFragmentManager().findFragmentById(R.id.fragment_container);
 
+                if (oldFragment instanceof FollowersFlowListFragment) {
+                    FollowersFlowListFragment updatedFollowersListFragment = new FollowersFlowListFragment();
+                    ft.replace(R.id.fragment_container, updatedFollowersListFragment);
+                    ft.commit();
+                }
+
                 // Check if the activated fragment was the FlowFragment.
                 if (oldFragment instanceof PublicFlowFragment) {
                     // Replace the old FlowFragment with a new one, my type of updating a fragment.
@@ -211,22 +241,37 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     private void loadHistory(String query) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            List items = getAllUsers(query);
+            List<String> searchedUserNames = new ArrayList<>();
+
+        if (allUsers != null) {
+            // Check if the one of the liker is the activated person.
+            for (int i = 0; i < allUsers.length(); i++) {
+                try {
+                    JSONObject jsonObject = allUsers.getJSONObject(i);
+                    String username = jsonObject.getString(USERNAME_TAG);
+                    if (username.toLowerCase().contains(query.toLowerCase())) {
+                        searchedUserNames.add(username);
+                    }
+                } catch (JSONException e1) {
+                    e1.printStackTrace();
+                }
+            }
+        }
 
             // Cursor
             String[] columns = new String[]{"_id", "text"};
             Object[] temp = new Object[]{0, "default"};
             MatrixCursor cursor = new MatrixCursor(columns);
 
-            for (int i = 0; i < items.size(); i++) {
+            for (int i = 0; i < searchedUserNames.size(); i++) {
                 temp[0] = i;
-                temp[1] = items.get(i);
+                temp[1] = searchedUserNames.get(i);
                 cursor.addRow(temp);
             }
             // SearchView
             SearchManager manager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
             final SearchView search = (SearchView) menu.findItem(R.id.action_search).getActionView();
-            search.setSuggestionsAdapter(new SearchUserAdapter(this, cursor, items));
+            search.setSuggestionsAdapter(new SearchUserAdapter(this, cursor, searchedUserNames));
             search.setOnSuggestionListener(new SearchView.OnSuggestionListener() {
 
                 @Override
@@ -234,22 +279,25 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
                     return false;
                 }
 
+
                 @Override
                 public boolean onSuggestionClick(int position) {
                     String user_id = null;
 
-                    if (allUsersOnQuery != null){
+                    hideKeyboard();
+                    mSearchMenuItem.collapseActionView();
+
+                    if (allUsers != null){
                         try {
-                            JSONObject jsonObject = allUsersOnQuery.getJSONObject(position);
+                            JSONObject jsonObject = allUsers.getJSONObject(position);
                             user_id = jsonObject.getString(ID_TAG);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
                         if (user_id != null){
-                            hideKeyboard();
                             onMyPageClicked(user_id);
+                            return true;
                         }
-                        return true;
                     }
                     return false;
                 }
@@ -260,14 +308,18 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
     }
 
     private void hideKeyboard() {
-        final InputMethodManager imm = (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        View view = this.getCurrentFocus();
+        if (view != null) {
+            InputMethodManager inputManager = (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);
+            inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+        }
     }
 
-    private List getAllUsers(String query) {
+    private JSONArray getAllUsers() {
         String allUsers;
         JSONObject jsonObject;
-        List<String> searchedUserNames = new ArrayList<>();
+        JSONArray jsonArray = null;
+
         try {
             allUsers = new GetTask().execute(MainActivity.URL + "/all_users").get();
         } catch (InterruptedException | ExecutionException e) {
@@ -277,26 +329,12 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
         if (!allUsers.equals("server error")) {
             try {
                 jsonObject = new JSONObject(allUsers);
-                allUsersOnQuery = jsonObject.getJSONArray(USER_TAG);
+                jsonArray = jsonObject.getJSONArray(USER_TAG);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
-        if (allUsersOnQuery != null) {
-            // Check if the one of the likerS is the activated person.
-            for (int e = 0; e < allUsersOnQuery.length(); e++) {
-                try {
-                    jsonObject = allUsersOnQuery.getJSONObject(e);
-                    String username = jsonObject.getString(USERNAME_TAG);
-                    if (username.toLowerCase().contains(query.toLowerCase())) {
-                        searchedUserNames.add(username);
-                    }
-                } catch (JSONException e1) {
-                    e1.printStackTrace();
-                }
-            }
-        }
-        return searchedUserNames;
+        return jsonArray;
     }
 
 
@@ -310,6 +348,8 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
     public void onButtonClicked(View view) {
         FragmentManager fm = getFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
+
+        hideKeyboard();
         // Switch to replace the fragment with the right one.
         switch (view.getId()) {
             case R.id.toplist_button:
@@ -331,11 +371,6 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
                 break;
             case R.id.back_button:
                 onBackPressed();
-                break;
-            case R.id.comment:
-                CommentFragment commentFragment = new CommentFragment();
-                ft.replace(R.id.fragment_container, commentFragment);
-                ft.commit();
                 break;
         }
     }
@@ -374,7 +409,7 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
     }
 
     @Override
-    public void onCommentButtonClicked(String postId) {
+    public void onCommentButtonClicked(String postId, Fragment currentFragment) {
         FragmentManager fm = getFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
 
@@ -384,12 +419,16 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
         CommentFragment commentFragment = new CommentFragment();
         ft.replace(R.id.fragment_container, commentFragment);
         commentFragment.setArguments(bundle);
-        ft.addToBackStack(null);
+
+        if (!(currentFragment instanceof CommentFragment)) {
+            ft.addToBackStack(null);
+        }
         ft.commit();
     }
 
     @Override
     public void onMyPageClicked(String user_id) {
+        hideKeyboard();
         FragmentManager fm = getFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
 

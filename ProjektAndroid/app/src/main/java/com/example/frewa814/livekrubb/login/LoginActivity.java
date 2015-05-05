@@ -72,6 +72,7 @@ public class LoginActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+
         // Set up the login form.
         mUsernameView = (EditText) findViewById(R.id.usernameField);
 
@@ -114,10 +115,7 @@ public class LoginActivity extends Activity {
         startActivity(registerScreen);
     }
 
-    private void hideKeyboard() {
-        InputMethodManager inputMgr = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-        inputMgr.hideSoftInputFromWindow(mPasswordView.getWindowToken(), 0);
-    }
+
     /**
      * Attempts to sign in.
      * If there are form errors (invalid email, missing fields, etc.), the
@@ -337,6 +335,14 @@ public class LoginActivity extends Activity {
 
         inputStream.close();
         return result;
+    }
+
+    private void hideKeyboard() {
+        View view = this.getCurrentFocus();
+        if (view != null) {
+            InputMethodManager inputManager = (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);
+            inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+        }
     }
 }
 

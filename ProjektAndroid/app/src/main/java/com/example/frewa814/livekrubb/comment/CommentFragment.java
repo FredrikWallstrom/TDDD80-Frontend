@@ -2,6 +2,7 @@ package com.example.frewa814.livekrubb.comment;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.Fragment;
 import android.app.ListFragment;
 import android.content.Context;
 import android.os.AsyncTask;
@@ -90,6 +91,7 @@ public class CommentFragment extends ListFragment {
 
         mCommentView = (EditText) rootView.findViewById(R.id.comment_edit_text_view);
 
+
         return rootView;
     }
 
@@ -104,25 +106,27 @@ public class CommentFragment extends ListFragment {
                 try {
                     MakeCommentTask task = new MakeCommentTask();
                     result = task.execute().get();
-                    System.out.println(result);
                 } catch (InterruptedException | ExecutionException e) {
                     result = "server error";
                     e.printStackTrace();
                 }
 
-                if (!result.equals("server error")){
-                    mListener.onCommentButtonClicked(mPostID);
+                if (!result.equals("server error")) {
+                    refreshFragment();
                 }
-
-            } else {
+            }else{
                 mListener.onButtonClicked(view);
             }
+
         }
     };
 
     private void hideKeyboard() {
-        final InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(getView().getWindowToken(), 0);
+        View view = getActivity().getCurrentFocus();
+        if (view != null) {
+            InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+            inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+        }
     }
 
     @Override
@@ -130,7 +134,10 @@ public class CommentFragment extends ListFragment {
         super.onActivityCreated(savedInstanceState);
 
 
-         mPostID = getArguments().getString("post_id");
+
+        mPostID = getArguments().getString("post_id");
+
+
 
         // Get all posts in the database that's gonna represent the flow.
         getDataInList();
@@ -150,8 +157,6 @@ public class CommentFragment extends ListFragment {
             comments = getAllComments();
             if (comments != null) {
                 if (comments.length() != 0) {
-                    comments = getCommentsSorted(comments);
-
 
                     for (int i = 0; i < comments.length(); i++) {
                         JSONObject object = comments.getJSONObject(i);
@@ -212,36 +217,6 @@ public class CommentFragment extends ListFragment {
         }
     }
 
-    private JSONArray getCommentsSorted(JSONArray comments) {
-        List<JSONObject> jsonValues = new ArrayList<>();
-        for (int i = 0; i <comments.length(); i++)
-            try {
-                jsonValues.add(comments.getJSONObject(i));
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        Collections.sort(jsonValues, new Comparator<JSONObject>() {
-            @Override
-            public int compare(JSONObject lhs, JSONObject rhs) {
-                String valA = "";
-                String valB = "";
-                try {
-                    valA = lhs.getString("timestamp");
-                    valB = rhs.getString("timestamp");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-                int comp = valA.compareTo(valB);
-                if (comp > 0)
-                    return -1;
-                if (comp < 0)
-                    return 1;
-                return 0;
-            }
-        });
-        return new JSONArray(jsonValues);
-    }
 
     private String getCommentAuthor(String commentAuthorID) {
         String postAuthor;
@@ -339,6 +314,15 @@ public class CommentFragment extends ListFragment {
 
         inputStream.close();
         return result;
+    }
+
+
+
+    public void refreshFragment() {
+        mCommentView.setText("");
+        getDataInList();
+        CommentListAdapter adapter = new CommentListAdapter(getActivity(), myList);
+        setListAdapter(adapter);
     }
 }
 

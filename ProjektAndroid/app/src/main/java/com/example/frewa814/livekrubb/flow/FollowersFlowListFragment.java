@@ -2,10 +2,12 @@ package com.example.frewa814.livekrubb.flow;
 
 import android.app.Activity;
 import android.app.ListFragment;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -49,8 +51,6 @@ public class FollowersFlowListFragment extends ListFragment {
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString() + " must implement OnButtonClickedListener ");
         }
-
-
     }
 
     @Override
@@ -201,6 +201,14 @@ public class FollowersFlowListFragment extends ListFragment {
                 }
             }
             return postAuthorName;
+        }
+    }
+
+    private void hideKeyboard() {
+        View view = getActivity().getCurrentFocus();
+        if (view != null) {
+            InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+            inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
         }
     }
 }

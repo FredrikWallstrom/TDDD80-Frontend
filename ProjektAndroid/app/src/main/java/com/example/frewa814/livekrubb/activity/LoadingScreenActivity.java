@@ -18,7 +18,6 @@ public class LoadingScreenActivity extends Activity {
     private final int WAIT_TIME = 1500;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // TODO Auto-generated method stub
         super.onCreate(savedInstanceState);
         setContentView(R.layout.loading_screen);
         findViewById(R.id.mainSpinner1).setVisibility(View.VISIBLE);

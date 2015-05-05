@@ -43,6 +43,7 @@ public class FlowListAdapter extends BaseAdapter {
     private static final String LIKES_TAG = "likes";
     private static final String USERNAME_TAG = "username";
     private static final String USER_ID_TAG = "user_id";
+    private static final String COMMENTS_TAG = "comments";
     private ArrayList myList = new ArrayList();
     private LayoutInflater inflater;
     private String mActivatedPerson = ActivatedUser.activatedUsername;
@@ -85,6 +86,7 @@ public class FlowListAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, final ViewGroup parent) {
         final MyViewHolder mViewHolder;
+        Boolean unLikeFlag = false;
 
         if (convertView == null) {
             convertView = inflater.inflate(R.layout.flow_list_item, parent, false);
@@ -116,15 +118,16 @@ public class FlowListAdapter extends BaseAdapter {
         // Get the postID
         String postID = flowListData.getPostID();
         // Update how many likes there is on the post.
-        JSONArray jsonArray = updateLikeView(postID, mViewHolder);
+        JSONArray likeArray = updateLikeView(postID, mViewHolder);
+        updateCommmentView(postID, mViewHolder);
 
-        Boolean unLikeFlag = false;
+
         // Check if something was returned from the updateLikeViews.
-        if (jsonArray != null) {
+        if (likeArray != null) {
             // Check if one of the likerS is the activated person.
-            for (int e = 0; e < jsonArray.length(); e++) {
+            for (int e = 0; e < likeArray.length(); e++) {
                 try {
-                    JSONObject jsonObject = jsonArray.getJSONObject(e);
+                    JSONObject jsonObject = likeArray.getJSONObject(e);
                     String username = jsonObject.getString(USERNAME_TAG);
                     if (username.equals(mActivatedPerson)) {
                         unLikeFlag = true;
@@ -206,7 +209,7 @@ public class FlowListAdapter extends BaseAdapter {
                                                              FlowListData flowListData = (FlowListData) myList.get(position);
                                                              String postID = flowListData.getPostID();
 
-                                                             mListener.onCommentButtonClicked(postID);
+                                                             mListener.onCommentButtonClicked(postID, fragment);
                                                          }
                                                      }
 
@@ -242,10 +245,38 @@ public class FlowListAdapter extends BaseAdapter {
         return convertView;
     }
 
+    private void updateCommmentView(String postID, MyViewHolder mViewHolder) {
+        String comments;
+        JSONArray jsonArray = null;
+        try {
+            comments = new GetTask().execute(MainActivity.URL + "/all_comments_on_post/" + postID).get();
+        } catch (InterruptedException | ExecutionException e) {
+            comments = "server error";
+            e.printStackTrace();
+        }
+
+        if (!comments.equals("server error")) {
+            try {
+                JSONObject jsonObject = new JSONObject(comments);
+                jsonArray = jsonObject.getJSONArray(COMMENTS_TAG);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        if (jsonArray != null) {
+            if (jsonArray.length() == 0) {
+                mViewHolder.displayCommentsView.setText("");
+            } else if (jsonArray.length() == 1){
+                mViewHolder.displayCommentsView.setText(jsonArray.length() + " " + "Comment");
+            } else{
+                mViewHolder.displayCommentsView.setText(jsonArray.length() + " " + "Comments");
+            }
+        }
+    }
+
 
     private JSONArray updateLikeView(String postID, MyViewHolder mViewHolder) {
         String likerS;
-        JSONObject jsonObject;
         JSONArray jsonArray = null;
         try {
             likerS = new GetTask().execute(MainActivity.URL + "/all_likes_on_post/" + postID).get();
@@ -256,7 +287,7 @@ public class FlowListAdapter extends BaseAdapter {
 
         if (!likerS.equals("server error")) {
             try {
-                jsonObject = new JSONObject(likerS);
+                JSONObject jsonObject = new JSONObject(likerS);
                 jsonArray = jsonObject.getJSONArray(LIKES_TAG);
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -291,35 +322,25 @@ public class FlowListAdapter extends BaseAdapter {
         try {
             // Create HttpClient
             HttpClient httpclient = new DefaultHttpClient();
-
             // Make makePost request to the given URL
             HttpPost httpPost = new HttpPost(MainActivity.URL + "/like_post");
-
             String json;
-
             // Build jsonObject
             JSONObject jsonObject = new JSONObject();
             jsonObject.accumulate("postid", postId);
             jsonObject.accumulate("liker", liker);
-
             // Convert JSONObject to JSON to String
             json = jsonObject.toString();
-
             // Set json to StringEntity
             StringEntity se = new StringEntity(json);
-
             // Set httpPost Entity
             httpPost.setEntity(se);
-
             // Execute makePost request to the given URL
             HttpResponse httpResponse = httpclient.execute(httpPost);
-
             // Receive response as inputStream.
             inputStream = httpResponse.getEntity().getContent();
-
             // Convert the inputStream to string.
             result = convertInputStreamToString(inputStream);
-
         } catch (Exception e) {
             result = "server error";
             e.printStackTrace();
