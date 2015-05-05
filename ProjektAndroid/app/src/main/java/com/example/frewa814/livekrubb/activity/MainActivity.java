@@ -23,11 +23,12 @@ import android.widget.SearchView;
 import com.example.frewa814.livekrubb.R;
 import com.example.frewa814.livekrubb.asynctask.GetTask;
 import com.example.frewa814.livekrubb.comment.CommentFragment;
-import com.example.frewa814.livekrubb.flow.FlowFragment;
+import com.example.frewa814.livekrubb.flow.FollowersFlowListFragment;
+import com.example.frewa814.livekrubb.flow.PublicFlowFragment;
 import com.example.frewa814.livekrubb.misc.ActivatedUser;
 import com.example.frewa814.livekrubb.recipe.ShareRecipeFragment;
 import com.example.frewa814.livekrubb.recipe.ShowRecipeFragment;
-import com.example.frewa814.livekrubb.mypage.MyPageFragment;
+import com.example.frewa814.livekrubb.flow.MyPageFragment;
 import com.example.frewa814.livekrubb.misc.OnButtonClickedListener;
 import com.example.frewa814.livekrubb.recipe.RecipeBankFragment;
 import com.example.frewa814.livekrubb.recipe.TopListFragment;
@@ -63,8 +64,8 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
         if (findViewById(R.id.fragment_container) != null) {
             FragmentManager fm = getFragmentManager();
             FragmentTransaction ft = fm.beginTransaction();
-            FlowFragment updatedFlowFragment = new FlowFragment();
-            ft.add(R.id.fragment_container, updatedFlowFragment);
+            PublicFlowFragment updatedPublicFlowFragment = new PublicFlowFragment();
+            ft.add(R.id.fragment_container, updatedPublicFlowFragment);
             ft.commit();
         }
     }
@@ -151,9 +152,15 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
                 break;
 
             // Case Flow list button. Change to FlowFragment.
-            case R.id.action_flow:
-                FlowFragment flowFragment = new FlowFragment();
-                ft.replace(R.id.fragment_container, flowFragment);
+            case R.id.action_public_flow:
+                PublicFlowFragment publicFlowFragment = new PublicFlowFragment();
+                ft.replace(R.id.fragment_container, publicFlowFragment);
+                ft.commit();
+                break;
+
+            case R.id.action__followers_flow:
+                FollowersFlowListFragment followersFlowListFragment = new FollowersFlowListFragment();
+                ft.replace(R.id.fragment_container, followersFlowListFragment);
                 ft.commit();
                 break;
         }
@@ -177,10 +184,10 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
                 Fragment oldFragment = getFragmentManager().findFragmentById(R.id.fragment_container);
 
                 // Check if the activated fragment was the FlowFragment.
-                if (oldFragment instanceof FlowFragment) {
+                if (oldFragment instanceof PublicFlowFragment) {
                     // Replace the old FlowFragment with a new one, my type of updating a fragment.
-                    FlowFragment updatedFlowFragment = new FlowFragment();
-                    ft.replace(R.id.fragment_container, updatedFlowFragment);
+                    PublicFlowFragment updatedPublicFlowFragment = new PublicFlowFragment();
+                    ft.replace(R.id.fragment_container, updatedPublicFlowFragment);
                     ft.commit();
                 }
                 // Check if the activated fragment was the RecipeFragment.
@@ -322,25 +329,12 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
                 ft.addToBackStack(null);
                 ft.commit();
                 break;
-            case R.id.back_from_show_recipe:
-            case R.id.back_from_comment:
+            case R.id.back_button:
                 onBackPressed();
                 break;
             case R.id.comment:
                 CommentFragment commentFragment = new CommentFragment();
                 ft.replace(R.id.fragment_container, commentFragment);
-                ft.commit();
-                break;
-            case R.id.back_from_share_recipe:
-                // Show the actionbar.
-                ActionBar actionBar = this.getActionBar();
-                if (actionBar != null) {
-                    actionBar.show();
-                }
-                // Change to FlowFragment.
-                FlowFragment flowFragment = new FlowFragment();
-                ft.replace(R.id.fragment_container, flowFragment);
-                fm.popBackStack();
                 ft.commit();
                 break;
         }
@@ -357,8 +351,8 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
 
         FragmentManager fm = getFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
-        FlowFragment flowFragment = new FlowFragment();
-        ft.replace(R.id.fragment_container, flowFragment);
+        PublicFlowFragment publicFlowFragment = new PublicFlowFragment();
+        ft.replace(R.id.fragment_container, publicFlowFragment);
         ft.commit();
     }
 
@@ -366,6 +360,7 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
     public void onShowRecipeButtonClicked(JSONObject recipe) {
         FragmentManager fm = getFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
+
 
         Bundle details = new Bundle();
         String recipeString = recipe.toString();

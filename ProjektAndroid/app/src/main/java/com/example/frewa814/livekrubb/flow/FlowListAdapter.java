@@ -1,5 +1,6 @@
 package com.example.frewa814.livekrubb.flow;
 
+import android.app.Fragment;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.view.LayoutInflater;
@@ -41,16 +42,19 @@ public class FlowListAdapter extends BaseAdapter {
     private static final String RESULT_TAG = "result";
     private static final String LIKES_TAG = "likes";
     private static final String USERNAME_TAG = "username";
+    private static final String USER_ID_TAG = "user_id";
     private ArrayList myList = new ArrayList();
     private LayoutInflater inflater;
     private String mActivatedPerson = ActivatedUser.activatedUsername;
     OnButtonClickedListener mListener;
+    private Fragment fragment;
 
 
-    public FlowListAdapter(Context cont, ArrayList myList) {
+    public FlowListAdapter(Context cont, ArrayList myList, Fragment fragment) {
+        this.fragment = fragment;
         this.myList = myList;
-        Context context = cont;
-        inflater = LayoutInflater.from(context);
+
+        inflater = LayoutInflater.from(cont);
 
         try {
             mListener = (OnButtonClickedListener) cont;
@@ -58,8 +62,6 @@ public class FlowListAdapter extends BaseAdapter {
             throw new ClassCastException(cont.toString() + " must implement OnButtonClickedListener ");
         }
     }
-
-
 
 
     @Override
@@ -81,7 +83,7 @@ public class FlowListAdapter extends BaseAdapter {
      * This will run every time there is a post that's will need to be loaded.
      */
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(int position, View convertView, final ViewGroup parent) {
         final MyViewHolder mViewHolder;
 
         if (convertView == null) {
@@ -148,89 +150,95 @@ public class FlowListAdapter extends BaseAdapter {
                 ListView listView = (ListView) parentRow.getParent();
                 int position = listView.getPositionForView(parentRow);
 
+                FlowListData flowListData = (FlowListData) myList.get(position);
+                String postID = flowListData.getPostID();
+
+
+                MakeLikeTask postTask = new MakeLikeTask(postID, mActivatedPerson);
+
                 try {
-                    // Make an like or unlike depend what the user want
-                    // (the database will check if the user is liking the post already).
-                    JSONObject likedPost = (JSONObject) FlowFragment.posts.get(position);
-                    String postId = likedPost.getString("id");
-                    MakeLikeTask postTask = new MakeLikeTask(postId, mActivatedPerson);
                     String result = postTask.execute((Void) null).get();
 
                     // Check if the user want to unlike or like and set the right text to the button.
                     if (result.equals("un_liked")) {
                         mViewHolder.likeButton.setText("Like");
-                    }
-                    else{
+                    } else {
                         mViewHolder.likeButton.setText("Unlike");
                     }
-
-                    // Update the likeView.
-                    updateLikeView(postId, mViewHolder);
-
-                } catch (InterruptedException | ExecutionException | JSONException e) {
-                    e.printStackTrace();
+                } catch (InterruptedException | ExecutionException e1) {
+                    e1.printStackTrace();
                 }
+
+
+                // Update the likeView.
+                updateLikeView(postID, mViewHolder);
             }
         });
 
-        mViewHolder.recipeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                View parentRow = (View) v.getParent();
-                ListView listView = (ListView) parentRow.getParent();
-                int position = listView.getPositionForView(parentRow);
 
-                JSONObject recipe = null;
+        mViewHolder.recipeButton.setOnClickListener(new View.OnClickListener()
 
-                try {
-                    recipe = (JSONObject) FlowFragment.posts.get(position);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                                                    {
+                                                        @Override
+                                                        public void onClick(View v) {
+                                                            View parentRow = (View) v.getParent();
+                                                            ListView listView = (ListView) parentRow.getParent();
+                                                            int position = listView.getPositionForView(parentRow);
 
-                mListener.onShowRecipeButtonClicked(recipe);
-            }
-        });
+                                                            FlowListData flowListData = (FlowListData) myList.get(position);
+                                                            JSONObject recipe = flowListData.getRecipe();
 
-        mViewHolder.commentButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                View parentRow = (View) v.getParent();
-                ListView listView = (ListView) parentRow.getParent();
-                int position = listView.getPositionForView(parentRow);
+                                                            mListener.onShowRecipeButtonClicked(recipe);
+                                                        }
+                                                    }
 
-                String postId = null;
+        );
 
-                try {
-                    JSONObject post = (JSONObject) FlowFragment.posts.get(position);
-                    postId = post.getString("id");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+        mViewHolder.commentButton.setOnClickListener(new View.OnClickListener()
 
-                mListener.onCommentButtonClicked(postId);
-            }
-        });
+                                                     {
+                                                         @Override
+                                                         public void onClick(View v) {
+                                                             View parentRow = (View) v.getParent();
+                                                             ListView listView = (ListView) parentRow.getParent();
+                                                             int position = listView.getPositionForView(parentRow);
 
-        mViewHolder.postAuthorView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                View parentRow = (View) v.getParent();
-                ListView listView = (ListView) parentRow.getParent();
-                int position = listView.getPositionForView(parentRow);
+                                                             FlowListData flowListData = (FlowListData) myList.get(position);
+                                                             String postID = flowListData.getPostID();
 
-                String userId = null;
+                                                             mListener.onCommentButtonClicked(postID);
+                                                         }
+                                                     }
 
-                try {
-                    JSONObject post = (JSONObject) FlowFragment.posts.get(position);
-                    userId = post.getString("user_id");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+        );
 
-                mListener.onMyPageClicked(userId);
-            }
-        });
+        mViewHolder.postAuthorView.setOnClickListener(new View.OnClickListener()
+
+                                                      {
+                                                          @Override
+                                                          public void onClick(View v) {
+                                                              String userID = null;
+
+                                                              View parentRow = (View) v.getParent();
+                                                              ListView listView = (ListView) parentRow.getParent();
+                                                              int position = listView.getPositionForView(parentRow);
+
+                                                              FlowListData flowListData = (FlowListData) myList.get(position);
+                                                              JSONObject recipe = flowListData.getRecipe();
+
+                                                              try {
+                                                                  userID = recipe.getString(USER_ID_TAG);
+                                                              } catch (JSONException e) {
+                                                                  e.printStackTrace();
+                                                              }
+
+                                                              if (userID != null) {
+                                                                  mListener.onMyPageClicked(userID);
+                                                              }
+                                                          }
+                                                      }
+
+        );
         return convertView;
     }
 
@@ -254,11 +262,10 @@ public class FlowListAdapter extends BaseAdapter {
                 e.printStackTrace();
             }
         }
-        if (jsonArray != null){
+        if (jsonArray != null) {
             if (jsonArray.length() == 0) {
                 mViewHolder.displayLikesView.setText("");
-            }
-            else {
+            } else {
                 mViewHolder.displayLikesView.setText(jsonArray.length() + " " + "Likes");
             }
             return jsonArray;
@@ -323,6 +330,7 @@ public class FlowListAdapter extends BaseAdapter {
     /**
      * Private task class that will be running in the background,
      * when it is done it will return the result to the onClickListener for the like button.
+     *
      * @result will be "liked" or "un_liked" depend on what the database has did.
      */
     private class MakeLikeTask extends AsyncTask<Void, Void, String> {
@@ -348,6 +356,7 @@ public class FlowListAdapter extends BaseAdapter {
             }
             return result;
         }
+
     }
 
     private String convertInputStreamToString(InputStream inputStream) throws IOException {

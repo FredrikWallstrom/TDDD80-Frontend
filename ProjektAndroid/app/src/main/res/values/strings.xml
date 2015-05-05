@@ -12,7 +12,8 @@
     <string name="recipe_bank">Recipe Bank</string>
     <string name="my_page">My page</string>
     <string name="description_items_search">Each item for search dropdownlist</string>
-    <string name="news">News</string>
+    <string name="public_news">Public News</string>
+    <string name="followers_news">Followers News</string>
 
 
 </resources>

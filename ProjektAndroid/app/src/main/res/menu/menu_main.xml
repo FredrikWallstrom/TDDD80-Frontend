@@ -26,11 +26,17 @@
         android:title="@string/over_flow">
         <menu>
 
-            <!-- Flow list -->
+            <!-- Public Flow list -->
             <item
-                android:id="@+id/action_flow"
+                android:id="@+id/action_public_flow"
                 android:showAsAction="never"
-                android:title="@string/news" />
+                android:title="@string/public_news" />
+
+            <!-- Followers Flow list -->
+            <item
+                android:id="@+id/action__followers_flow"
+                android:showAsAction="never"
+                android:title="@string/followers_news" />
 
             <!-- My page -->
             <item

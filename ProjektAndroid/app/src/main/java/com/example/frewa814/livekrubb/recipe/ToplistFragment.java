@@ -126,7 +126,9 @@ public class TopListFragment extends ListFragment implements AdapterView.OnItemC
             Boolean firstRun = true;
             for (String s : splitedList) {
                 if (!firstRun){
-                    sb.append(s);
+                    if (counter <= 5){
+                        sb.append(s);
+                    }
                 }else{
                     firstRun = false;
                 }

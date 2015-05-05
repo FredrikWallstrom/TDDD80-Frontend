@@ -1,7 +1,6 @@
-package com.example.frewa814.livekrubb.mypage;
+package com.example.frewa814.livekrubb.flow;
 
 import android.app.ListFragment;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,7 +13,7 @@ import com.example.frewa814.livekrubb.R;
 import com.example.frewa814.livekrubb.activity.MainActivity;
 import com.example.frewa814.livekrubb.asynctask.FollowTask;
 import com.example.frewa814.livekrubb.asynctask.GetTask;
-import com.example.frewa814.livekrubb.flow.FlowFragment;
+import com.example.frewa814.livekrubb.flow.PublicFlowFragment;
 import com.example.frewa814.livekrubb.flow.FlowListAdapter;
 import com.example.frewa814.livekrubb.flow.FlowListData;
 import com.example.frewa814.livekrubb.misc.ActivatedUser;
@@ -23,13 +22,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -80,7 +74,7 @@ public class MyPageFragment extends ListFragment {
         getDataInList();
 
         // Make custom adapter and set it to the listview.
-        FlowListAdapter adapter = new FlowListAdapter(getActivity(), myList);
+        FlowListAdapter adapter = new FlowListAdapter(getActivity(), myList, this);
         setListAdapter(adapter);
     }
 
@@ -102,8 +96,8 @@ public class MyPageFragment extends ListFragment {
                     jsonArray = jsonObject.getJSONArray(USERS_TAG);
                     for (int i = 0; i < jsonArray.length(); i++) {
                         jsonObject = jsonArray.getJSONObject(i);
-                        String userID = jsonObject.getString(USER_ID_TAG);
-                        if (userID.equals(mUserID)){
+                        String userID = jsonObject.getString(ID_TAG);
+                        if (userID.equals(ActivatedUser.activatedUserID)){
                             return true;
                         }
                     }
@@ -154,9 +148,12 @@ public class MyPageFragment extends ListFragment {
         List<String> postIDList = new ArrayList<>();
         myList = new ArrayList<>();
         JSONArray posts;
+        List<JSONObject> recipeList = new ArrayList<>();
+
+
 
         try {
-            posts = FlowFragment.posts;
+            posts = PublicFlowFragment.posts;
             if (posts != null) {
                 if (posts.length() != 0) {
                     for (int i = 0; i < posts.length(); i++) {
@@ -173,6 +170,7 @@ public class MyPageFragment extends ListFragment {
                             recipeNameList.add(recipeName);
                             postInformationList.add(postInformation);
                             postAuthorList.add(postAuthor);
+                            recipeList.add(object);
                         }
                     }
                 }
@@ -193,6 +191,7 @@ public class MyPageFragment extends ListFragment {
             flowListData.setRecipeName(recipeNameList.get(loopInteger));
             flowListData.setPostInformation(postInformationList.get(loopInteger));
             flowListData.setPostID(postIDList.get(loopInteger));
+            flowListData.setRecipe(recipeList.get(loopInteger));
 
             // Add this object into the ArrayList myList
             myList.add(flowListData);
@@ -236,6 +235,7 @@ public class MyPageFragment extends ListFragment {
             FollowTask followTask = new FollowTask(ActivatedUser.activatedUserID, mUserID);
             try {
                 String result = followTask.execute((Void) null).get();
+                System.out.println(result);
                 if (result.equals("un_followed")) {
                     followButton.setText("Follow");
                 }

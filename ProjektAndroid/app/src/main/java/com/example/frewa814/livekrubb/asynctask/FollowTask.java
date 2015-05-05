@@ -68,7 +68,7 @@ public class FollowTask extends AsyncTask<Void, Void, String> {
             // Create HttpClient
             HttpClient httpclient = new DefaultHttpClient();
             // Make makePost request to the given URL
-            HttpPost httpPost = new HttpPost(MainActivity.URL + "/like_post");
+            HttpPost httpPost = new HttpPost(MainActivity.URL + "/follow_user");
             String json;
             // Build jsonObject
             JSONObject jsonObject = new JSONObject();

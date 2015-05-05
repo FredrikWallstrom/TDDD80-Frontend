@@ -1,7 +1,6 @@
 package com.example.frewa814.livekrubb.recipe;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.app.ListFragment;
 import android.content.Context;
 import android.os.Bundle;
@@ -18,7 +17,7 @@ import android.widget.Toast;
 import com.example.frewa814.livekrubb.R;
 import com.example.frewa814.livekrubb.activity.MainActivity;
 import com.example.frewa814.livekrubb.asynctask.GetTask;
-import com.example.frewa814.livekrubb.flow.FlowFragment;
+import com.example.frewa814.livekrubb.flow.PublicFlowFragment;
 import com.example.frewa814.livekrubb.misc.OnButtonClickedListener;
 
 import org.json.JSONArray;
@@ -33,7 +32,6 @@ import java.util.concurrent.ExecutionException;
  */
 public class RecipeBankFragment extends ListFragment implements AdapterView.OnItemClickListener {
 
-    private static final String POSTS_TAG = "posts";
     private static final String RECIPE_NAME_TAG = "recipe_name";
     private static final String ID_TAG = "id";
     private static final String POST_TAG = "post";
@@ -85,7 +83,7 @@ public class RecipeBankFragment extends ListFragment implements AdapterView.OnIt
     }
 
     private void submitSearch(String query) {
-        JSONArray jsonArray = FlowFragment.posts;
+        JSONArray jsonArray = PublicFlowFragment.posts;
         recipeList = new ArrayList<>();
         recipeIDList = new ArrayList<>();
         for (int i = 0; i < jsonArray.length(); i++) {
@@ -133,7 +131,7 @@ public class RecipeBankFragment extends ListFragment implements AdapterView.OnIt
     }
 
     private void updateListView(String newText) {
-        JSONArray jsonArray = FlowFragment.posts;
+        JSONArray jsonArray = PublicFlowFragment.posts;
         recipeList = new ArrayList<>();
         recipeIDList = new ArrayList<>();
         for (int i = 0; i < jsonArray.length(); i++) {
@@ -181,7 +179,7 @@ public class RecipeBankFragment extends ListFragment implements AdapterView.OnIt
         recipeList = new ArrayList<>();
         recipeIDList = new ArrayList<>();
             try {
-                JSONArray jsonArray = FlowFragment.posts;
+                JSONArray jsonArray = PublicFlowFragment.posts;
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject jsonObject = jsonArray.getJSONObject(i);
                     String recipe_name = jsonObject.getString(RECIPE_NAME_TAG);

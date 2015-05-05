@@ -96,7 +96,7 @@ public class ShareRecipeFragment extends Fragment {
         mProgressView = rootView.findViewById(R.id.share_progress);
 
         // Set click listener for the buttons in the xml.
-        ImageView backButton = (ImageView) rootView.findViewById(R.id.back_from_share_recipe);
+        ImageView backButton = (ImageView) rootView.findViewById(R.id.back_button);
         Button shareButton = (Button) rootView.findViewById(R.id.share_recipe_button);
         shareButton.setOnClickListener(clickListener);
         backButton.setOnClickListener(clickListener);

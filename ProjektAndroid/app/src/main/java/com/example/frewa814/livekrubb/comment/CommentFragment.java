@@ -84,7 +84,7 @@ public class CommentFragment extends ListFragment {
 
         // Set button listener for the share recipe button.
         Button commentButton = (Button) rootView.findViewById(R.id.comment);
-        ImageView backButton = (ImageView) rootView.findViewById(R.id.back_from_comment);
+        ImageView backButton = (ImageView) rootView.findViewById(R.id.back_button);
         backButton.setOnClickListener(clickListener);
         commentButton.setOnClickListener(clickListener);
 

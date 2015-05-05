@@ -27,7 +27,7 @@ import java.util.concurrent.ExecutionException;
 /**
  * Fragment that gonna represent the flow.
  */
-public class FlowFragment extends ListFragment {
+public class PublicFlowFragment extends ListFragment {
 
     private static final String POST_TAG = "posts";
     private static final String RECIPE_NAME_TAG = "recipe_name";
@@ -55,7 +55,7 @@ public class FlowFragment extends ListFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.flow_list, container, false);
+        View rootView = inflater.inflate(R.layout.public_flow_list, container, false);
 
         // Set button listener for the share recipe button.
         Button postRecipeButton = (Button) rootView.findViewById(R.id.share_recipe_button);
@@ -72,7 +72,7 @@ public class FlowFragment extends ListFragment {
         getDataInList();
 
         // Make custom adapter and set it to the listview.
-        FlowListAdapter adapter = new FlowListAdapter(getActivity(), myList);
+        FlowListAdapter adapter = new FlowListAdapter(getActivity(), myList, this);
         setListAdapter(adapter);
     }
 
@@ -81,6 +81,7 @@ public class FlowFragment extends ListFragment {
         List<String> postInformationList = new ArrayList<>();
         List<String> postAuthorList = new ArrayList<>();
         List<String> postIDList = new ArrayList<>();
+        List<JSONObject> recipeList = new ArrayList<>();
         myList = new ArrayList();
 
         try {
@@ -103,6 +104,7 @@ public class FlowFragment extends ListFragment {
                         recipeNameList.add(recipeName);
                         postInformationList.add(postInformation);
                         postAuthorList.add(postAuthor);
+                        recipeList.add(object);
                     }
 
                 } else {
@@ -126,6 +128,7 @@ public class FlowFragment extends ListFragment {
             flowListData.setRecipeName(recipeNameList.get(loopInteger));
             flowListData.setPostInformation(postInformationList.get(loopInteger));
             flowListData.setPostID(postIDList.get(loopInteger));
+            flowListData.setRecipe(recipeList.get(loopInteger));
 
             // Add this object into the ArrayList myList
             myList.add(flowListData);
@@ -167,33 +170,7 @@ public class FlowFragment extends ListFragment {
         return new JSONArray(jsonValues);
     }
 
-    /**
-     * Get the posts author from the database.
-     */
-    private String getPostAuthor(String postAuthorID) {
-        String postAuthor;
-        String postAuthorName = null;
-        JSONObject jsonObject;
-        JSONArray jsonArray;
-        try {
-            postAuthor = new GetTask().execute(MainActivity.URL + "/get_user_by_id/" + postAuthorID).get();
-        } catch (InterruptedException | ExecutionException e) {
-            postAuthor = "server error";
-            e.printStackTrace();
-        }
 
-        if (!postAuthor.equals("server error")) {
-            try {
-                jsonObject = new JSONObject(postAuthor);
-                jsonArray = jsonObject.getJSONArray(USER_TAG);
-                jsonObject = jsonArray.getJSONObject(0);
-                postAuthorName = jsonObject.getString(USERNAME_TAG);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-        return postAuthorName;
-    }
 
     /**
      * Get all posts from the database.
@@ -231,6 +208,34 @@ public class FlowFragment extends ListFragment {
             mListener.onButtonClicked(view);
         }
     };
+
+
+    public String getPostAuthor(String postAuthorID) {
+        {
+            String postAuthor;
+            String postAuthorName = null;
+            JSONObject jsonObject;
+            JSONArray jsonArray;
+            try {
+                postAuthor = new GetTask().execute(MainActivity.URL + "/get_user_by_id/" + postAuthorID).get();
+            } catch (InterruptedException | ExecutionException e) {
+                postAuthor = "server error";
+                e.printStackTrace();
+            }
+
+            if (!postAuthor.equals("server error")) {
+                try {
+                    jsonObject = new JSONObject(postAuthor);
+                    jsonArray = jsonObject.getJSONArray(USER_TAG);
+                    jsonObject = jsonArray.getJSONObject(0);
+                    postAuthorName = jsonObject.getString(USERNAME_TAG);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            return postAuthorName;
+        }
+    }
 }
 
 

@@ -50,7 +50,7 @@ public class ShowRecipeFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.show_recipe, container, false);
 
         // Set click listener for the buttons in the xml.
-        ImageView backButton = (ImageView) rootView.findViewById(R.id.back_from_show_recipe);
+        ImageView backButton = (ImageView) rootView.findViewById(R.id.back_button);
         backButton.setOnClickListener(clickListener);
 
         mRecipeNameView = (TextView) rootView.findViewById(R.id.recipe_name_show_recipe);

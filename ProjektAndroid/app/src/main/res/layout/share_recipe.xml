@@ -35,7 +35,7 @@
                 android:weightSum="1">
 
                 <ImageView
-                    android:id="@+id/back_from_share_recipe"
+                    android:id="@+id/back_button"
                     android:layout_width="50dp"
                     android:layout_height="60dp"
                     android:contentDescription="TODO"
