@@ -14,6 +14,10 @@
     <string name="description_items_search">Each item for search dropdownlist</string>
     <string name="public_news">Public News</string>
     <string name="followers_news">Followers News</string>
+    <string name="address_found">address_found</string>
+    <string name="no_address_found">no_address_found</string>
+    <string name="invalid_lat_long_used">invalid_lat_long_used</string>
+    <string name="service_not_available">service_not_available</string>
 
 
 </resources>

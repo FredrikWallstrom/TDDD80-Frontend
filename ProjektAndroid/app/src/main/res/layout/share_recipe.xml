@@ -78,7 +78,7 @@
 
                 <ScrollView
                     android:layout_width="fill_parent"
-                    android:layout_height="200dp"
+                    android:layout_height="180dp"
                     android:fillViewport="true"
                     android:layout_marginBottom="25dp">
 
@@ -96,9 +96,9 @@
 
                 <ScrollView
                     android:layout_width="fill_parent"
-                    android:layout_height="70dp"
+                    android:layout_height="50dp"
                     android:fillViewport="true"
-                    android:layout_marginBottom="25dp">
+                    android:layout_marginBottom="20dp">
 
                     <EditText
                         android:layout_width="match_parent"
@@ -113,6 +113,27 @@
 
                 </ScrollView>
 
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="20dp">
+
+                    <Button
+                        style="?android:attr/buttonStyleSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Add your location"
+                        android:id="@+id/fetch_adress_button" />
+
+                    <TextView
+                        android:id="@+id/location_textview"
+                        android:layout_width="fill_parent"
+                        android:layout_height="match_parent" />
+
+
+                </LinearLayout>
+
+
                 <Button
                     android:id="@+id/share_recipe_button"
                     android:layout_width="fill_parent"
@@ -124,9 +145,7 @@
                     android:shadowRadius="5"
                     android:text="Share"
                     android:textColor="#545454"
-                    android:textSize="32sp"
-                    android:layout_alignParentBottom="true"
-                    android:layout_alignParentStart="true" />
+                    android:textSize="32sp" />
 
 
             </LinearLayout>

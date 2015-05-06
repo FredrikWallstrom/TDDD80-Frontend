@@ -266,6 +266,12 @@ public class MyPageFragment extends ListFragment {
             inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
         }
     }
+
+    public void refresh(){
+        getDataInList();
+        FlowListAdapter adapter = new FlowListAdapter(getActivity(), myList, this);
+        setListAdapter(adapter);
+    }
 }
 
 

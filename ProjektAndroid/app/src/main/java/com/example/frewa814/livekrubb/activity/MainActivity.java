@@ -56,7 +56,6 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
 
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -202,30 +201,24 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                FragmentManager fm = getFragmentManager();
-                FragmentTransaction ft = fm.beginTransaction();
 
                 Fragment oldFragment = getFragmentManager().findFragmentById(R.id.fragment_container);
 
+                if (oldFragment instanceof MyPageFragment){
+                    ((MyPageFragment) oldFragment).refresh();
+                }
+
                 if (oldFragment instanceof FollowersFlowListFragment) {
-                    FollowersFlowListFragment updatedFollowersListFragment = new FollowersFlowListFragment();
-                    ft.replace(R.id.fragment_container, updatedFollowersListFragment);
-                    ft.commit();
+                    ((FollowersFlowListFragment) oldFragment).refresh();
                 }
 
                 // Check if the activated fragment was the FlowFragment.
                 if (oldFragment instanceof PublicFlowFragment) {
-                    // Replace the old FlowFragment with a new one, my type of updating a fragment.
-                    PublicFlowFragment updatedPublicFlowFragment = new PublicFlowFragment();
-                    ft.replace(R.id.fragment_container, updatedPublicFlowFragment);
-                    ft.commit();
+                    ((PublicFlowFragment) oldFragment).refresh();
                 }
                 // Check if the activated fragment was the RecipeFragment.
                 if (oldFragment instanceof RecipeBankFragment) {
-                    // Replace the old FlowFragment with a new one, my type of updating a fragment.
-                    RecipeBankFragment updatedRecipeBankFragment = new RecipeBankFragment();
-                    ft.replace(R.id.fragment_container, updatedRecipeBankFragment);
-                    ft.commit();
+                    ((RecipeBankFragment) oldFragment).refresh();
                 }
 
                 // Stop the progressbar and return the update icon.

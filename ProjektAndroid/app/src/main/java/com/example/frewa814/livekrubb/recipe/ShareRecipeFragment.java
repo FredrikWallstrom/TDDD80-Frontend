@@ -7,9 +7,14 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
+import android.content.Intent;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.ResultReceiver;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,12 +22,18 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.frewa814.livekrubb.R;
 import com.example.frewa814.livekrubb.activity.MainActivity;
 import com.example.frewa814.livekrubb.misc.ActivatedUser;
+import com.example.frewa814.livekrubb.gps.Constants;
+import com.example.frewa814.livekrubb.gps.FetchAddressIntentService;
 import com.example.frewa814.livekrubb.misc.OnButtonClickedListener;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -37,14 +48,23 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+
+
 /**
  * This class will show the fragment where you can share a recipe on the flow.
  * In other words, this class will handle how to make a post on the flow.
  */
-public class ShareRecipeFragment extends Fragment {
+public class ShareRecipeFragment extends Fragment implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     OnButtonClickedListener mListener;
     private static final String RESULT_TAG = "result";
+
+    private GoogleApiClient mGoogleApiClient;
+    private Location mLastLocation;
+    private AddressResultReceiver mResultReceiver;
+    private boolean mAddressRequested;
+    private String mAddressOutput;
+    Button mFetchAddressButton;
 
     /**
      * Input strings by the user.
@@ -65,6 +85,11 @@ public class ShareRecipeFragment extends Fragment {
      */
     private View mProgressView;
     private View mPostForm;
+
+    /**
+     * Text view for the location view.
+     */
+    private TextView mLocationView;
 
     @Override
     public void onAttach(Activity activity) {
@@ -88,18 +113,30 @@ public class ShareRecipeFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        mResultReceiver = new AddressResultReceiver(new android.os.Handler());
+        mAddressRequested = false;
+        mAddressOutput = "";
+        buildGoogleApiClient();
+
+
+
+
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.share_recipe, container, false);
 
-        // Find the views that we want to hide or show when needed.
+        // Find the views in the share_recipe xml.
         mPostForm = rootView.findViewById(R.id.share_recipe_form);
         mProgressView = rootView.findViewById(R.id.share_progress);
+        mLocationView = (TextView) rootView.findViewById(R.id.location_textview);
+        mFetchAddressButton  = (Button) rootView.findViewById(R.id.fetch_adress_button);
 
         // Set click listener for the buttons in the xml.
         ImageView backButton = (ImageView) rootView.findViewById(R.id.back_button);
         Button shareButton = (Button) rootView.findViewById(R.id.share_recipe_button);
         shareButton.setOnClickListener(clickListener);
         backButton.setOnClickListener(clickListener);
+        mFetchAddressButton.setOnClickListener(clickListener);
 
 
         // Find the editTextViews in the xml where the user should add information about the recipe.
@@ -119,9 +156,21 @@ public class ShareRecipeFragment extends Fragment {
     View.OnClickListener clickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
+            if (view.getId() == R.id.fetch_adress_button){
+                final LocationManager manager = (LocationManager) getActivity().getSystemService( Context.LOCATION_SERVICE );
+
+                if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER ) ) {
+                    Toast noGps = Toast.makeText(getActivity(), "Your GPS is don't activated. Activate it and try again.", Toast.LENGTH_LONG);
+                    noGps.show();
+                }else{
+                    mGoogleApiClient.connect();
+                    mAddressRequested = true;
+                }
+
+            }
             // Check if the user clicked on the share recipe button.
             // If not, the user clicked on the back button and then we pass the click to the MainActivity.
-            if (view.getId() == R.id.share_recipe_button) {
+            else if (view.getId() == R.id.share_recipe_button) {
                 // Hide the keyboard.
                 hideKeyboard();
 
@@ -223,60 +272,67 @@ public class ShareRecipeFragment extends Fragment {
         }
     }
 
-    /**
-     * Do a http request and make a post to the database with the recipe information.
-     */
-    public String makePost(String url) {
-        InputStream inputStream;
-        String result;
-        try {
-            // Create HttpClient
-            HttpClient httpclient = new DefaultHttpClient();
-            // Make makePost request to the given URL
-            HttpPost httpPost = new HttpPost(url);
-            String json;
-            // Build jsonObject
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.accumulate("post_information", mPostInformation);
-            jsonObject.accumulate("recipe_information", mRecipeInformation);
-            jsonObject.accumulate("recipe_name", mRecipeName);
-            jsonObject.accumulate("user_id",ActivatedUser.activatedUserID);
-            // Convert JSONObject to JSON to String
-            json = jsonObject.toString();
-            // Set json to StringEntity
-            StringEntity se = new StringEntity(json);
-            // Set httpPost Entity
-            httpPost.setEntity(se);
-            // Execute makePost request to the given URL
-            HttpResponse httpResponse = httpclient.execute(httpPost);
-            // Receive response as inputStream.
-            inputStream = httpResponse.getEntity().getContent();
-            // Convert the inputStream to string.
-            result = convertInputStreamToString(inputStream);
-
-        } catch (Exception e) {
-            result = "server error";
-            e.printStackTrace();
+    @Override
+    public void onConnected(Bundle bundle) {
+        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        if (mLastLocation != null) {
+            if (!Geocoder.isPresent()) {
+                return;
+            }
+            if (mAddressRequested) {
+                startIntentService();
+            }
         }
-        return result;
     }
 
-    /**
-     * Converting the result from the makePost method to a readable string.
-     */
-    private String convertInputStreamToString(InputStream inputStream) throws IOException {
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-        String line;
-        String result = "";
-        while ((line = bufferedReader.readLine()) != null)
-            result += line;
-
-        inputStream.close();
-        return result;
+    protected void startIntentService() {
+        Intent intent = new Intent(getActivity(), FetchAddressIntentService.class);
+        intent.putExtra(Constants.RECEIVER, mResultReceiver);
+        intent.putExtra(Constants.LOCATION_DATA_EXTRA, mLastLocation);
+        getActivity().startService(intent);
     }
+
+    private void displayAddressOutput() {
+        mLocationView.setText(mAddressOutput);
+        mAddressRequested = false;
+    }
+
+    protected synchronized void buildGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+    }
+
+
+    private class AddressResultReceiver extends ResultReceiver {
+        public AddressResultReceiver(android.os.Handler handler) {
+            super(handler);
+        }
+
+        @Override
+        protected void onReceiveResult(int resultCode, Bundle resultData) {
+
+            // Display the address string
+            // or an error message sent from the intent service.
+            mAddressOutput = resultData.getString(Constants.RESULT_DATA_KEY);
+            displayAddressOutput();
+        }
+    }
+
 
     /**
      * Private anonymous class that will do one asyncTask so we can handle the httpRequest.
+     * This class will make a call to the server so we can add the post/recipe to the database.
      */
     private class SharePostTask extends AsyncTask<Void, Void, String> {
 
@@ -323,6 +379,58 @@ public class ShareRecipeFragment extends Fragment {
                     mListener.onTaskDone();
                     break;
             }
+        }
+
+        /**
+         * Do a http request and make a post to the database with the recipe information.
+         */
+        public String makePost(String url) {
+            InputStream inputStream;
+            String result;
+            try {
+                // Create HttpClient
+                HttpClient httpclient = new DefaultHttpClient();
+                // Make makePost request to the given URL
+                HttpPost httpPost = new HttpPost(url);
+                String json;
+                // Build jsonObject
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.accumulate("post_information", mPostInformation);
+                jsonObject.accumulate("recipe_information", mRecipeInformation);
+                jsonObject.accumulate("recipe_name", mRecipeName);
+                jsonObject.accumulate("user_id",ActivatedUser.activatedUserID);
+                // Convert JSONObject to JSON to String
+                json = jsonObject.toString();
+                // Set json to StringEntity
+                StringEntity se = new StringEntity(json);
+                // Set httpPost Entity
+                httpPost.setEntity(se);
+                // Execute makePost request to the given URL
+                HttpResponse httpResponse = httpclient.execute(httpPost);
+                // Receive response as inputStream.
+                inputStream = httpResponse.getEntity().getContent();
+                // Convert the inputStream to string.
+                result = convertInputStreamToString(inputStream);
+
+            } catch (Exception e) {
+                result = "server error";
+                e.printStackTrace();
+            }
+            return result;
+        }
+
+        /**
+         * Converting the result from the makePost method to a readable string.
+         */
+        private String convertInputStreamToString(InputStream inputStream) throws IOException {
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+            String line;
+            String result = "";
+            while ((line = bufferedReader.readLine()) != null)
+                result += line;
+
+            inputStream.close();
+            return result;
         }
     }
 }

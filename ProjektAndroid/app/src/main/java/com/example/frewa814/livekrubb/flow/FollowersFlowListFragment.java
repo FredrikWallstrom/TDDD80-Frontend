@@ -211,4 +211,11 @@ public class FollowersFlowListFragment extends ListFragment {
             inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
         }
     }
+
+    public void refresh(){
+        getDataInList();
+        // Make custom adapter and set it to the listview.
+        FlowListAdapter adapter = new FlowListAdapter(getActivity(), myList, this);
+        setListAdapter(adapter);
+    }
 }

@@ -1,6 +1,6 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="230dp"
+    android:layout_height="250dp"
     android:padding="6dip">
 
     <ImageView
@@ -80,7 +80,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:id="@+id/likes_count"
-        android:layout_below="@+id/post_information"
+        android:layout_above="@+id/like_button"
         android:layout_alignEnd="@+id/like_button"
         android:layout_toEndOf="@+id/comment_button" />
 
@@ -92,6 +92,25 @@
         android:layout_alignBottom="@+id/likes_count"
         android:layout_alignStart="@+id/post_information"
         android:layout_toStartOf="@+id/likes_count" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Location:"
+        android:id="@+id/textView2"
+        android:layout_above="@+id/comments_count"
+        android:layout_alignStart="@+id/comments_count"
+        android:layout_below="@+id/post_information" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/location_view_flow_item"
+        android:layout_above="@+id/likes_count"
+        android:layout_alignEnd="@+id/likes_count"
+        android:layout_toEndOf="@+id/textView2"
+        android:layout_below="@+id/post_information"
+        android:layout_marginLeft="10dp" />
 
 
 </RelativeLayout>

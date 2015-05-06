@@ -222,4 +222,12 @@ public class RecipeBankFragment extends ListFragment implements AdapterView.OnIt
         }
         mListener.onShowRecipeButtonClicked(jsonObject);
     }
+
+    public void refresh(){
+        getDataInList();
+        ArrayAdapter<String> adapter = new ArrayAdapter<String> (getActivity(), android.R.layout.simple_list_item_1, recipeList);
+        setListAdapter(adapter);
+        getListView().setOnItemClickListener(this);
+    }
+
 }
