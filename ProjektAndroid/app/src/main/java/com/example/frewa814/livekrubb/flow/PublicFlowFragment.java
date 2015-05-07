@@ -11,6 +11,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.example.frewa814.livekrubb.adapters.FlowListAdapter;
 import com.example.frewa814.livekrubb.asynctask.GetTask;
 import com.example.frewa814.livekrubb.activity.MainActivity;
 import com.example.frewa814.livekrubb.R;
@@ -38,6 +39,7 @@ public class PublicFlowFragment extends ListFragment {
     private static final String USERNAME_TAG = "username";
     private static final String USER_TAG = "user";
     private static final String ID_TAG = "id";
+    private static final String LOCATION_TAG = "location";
 
     public static JSONArray posts;
     private ArrayList myList;
@@ -84,6 +86,8 @@ public class PublicFlowFragment extends ListFragment {
         List<String> postAuthorList = new ArrayList<>();
         List<String> postIDList = new ArrayList<>();
         List<JSONObject> recipeList = new ArrayList<>();
+        List<String> locationList = new ArrayList<>();
+
         myList = new ArrayList();
 
         try {
@@ -99,9 +103,11 @@ public class PublicFlowFragment extends ListFragment {
                         String postInformation = object.getString(POST_INFORMATION_TAG);
                         String postAuthorID = object.getString(POST_AUTHOR_ID_TAG);
                         String postID = object.getString(ID_TAG);
+                        String location = object.getString(LOCATION_TAG);
 
                         String postAuthor = getPostAuthor(postAuthorID);
 
+                        locationList.add(location);
                         postIDList.add(postID);
                         recipeNameList.add(recipeName);
                         postInformationList.add(postInformation);
@@ -131,6 +137,7 @@ public class PublicFlowFragment extends ListFragment {
             flowListData.setPostInformation(postInformationList.get(loopInteger));
             flowListData.setPostID(postIDList.get(loopInteger));
             flowListData.setRecipe(recipeList.get(loopInteger));
+            flowListData.setLocation(locationList.get(loopInteger));
 
             // Add this object into the ArrayList myList
             myList.add(flowListData);

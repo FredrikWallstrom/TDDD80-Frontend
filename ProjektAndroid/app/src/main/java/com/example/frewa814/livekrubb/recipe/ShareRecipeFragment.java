@@ -53,18 +53,28 @@ import java.io.InputStreamReader;
 /**
  * This class will show the fragment where you can share a recipe on the flow.
  * In other words, this class will handle how to make a post on the flow.
+ * You can also add your location to the post so this class will also have some gps methods.
  */
 public class ShareRecipeFragment extends Fragment implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
-    OnButtonClickedListener mListener;
+    /**
+     * Constants.
+     */
     private static final String RESULT_TAG = "result";
 
+    /**
+     * Click listener for MainActivity.
+     */
+    OnButtonClickedListener mListener;
+
+    /**
+     * This fields is for the gps workout.
+     */
     private GoogleApiClient mGoogleApiClient;
     private Location mLastLocation;
     private AddressResultReceiver mResultReceiver;
-    private boolean mAddressRequested;
     private String mAddressOutput;
-    Button mFetchAddressButton;
+    private boolean mLocationRequested;
 
     /**
      * Input strings by the user.
@@ -72,6 +82,7 @@ public class ShareRecipeFragment extends Fragment implements GoogleApiClient.Con
     private String mRecipeName;
     private String mRecipeInformation;
     private String mPostInformation;
+    private String mLocationInformation;
 
     /**
      * EditTextViews in the xml where the user should add the data about the recipe.
@@ -91,6 +102,9 @@ public class ShareRecipeFragment extends Fragment implements GoogleApiClient.Con
      */
     private TextView mLocationView;
 
+    /**
+     * Runs first when fragment is created.
+     */
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -108,19 +122,25 @@ public class ShareRecipeFragment extends Fragment implements GoogleApiClient.Con
         }
     }
 
-
-
+    /**
+     * This will run as second method when creating fragment.
+     / This will inflate the right xml and find the needed buttons and text views etc.
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        mResultReceiver = new AddressResultReceiver(new android.os.Handler());
-        mAddressRequested = false;
-        mAddressOutput = "";
+        // Need to connect to the GoogleApiService.
         buildGoogleApiClient();
 
+        // At the beginning the user don't want to add the location.
+        mLocationRequested = false;
 
+        // Setting address output to "".
+        mAddressOutput = "";
 
+        // Make an new ResultReceiver object.
+        mResultReceiver = new AddressResultReceiver(new android.os.Handler());
 
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.share_recipe, container, false);
@@ -128,23 +148,22 @@ public class ShareRecipeFragment extends Fragment implements GoogleApiClient.Con
         // Find the views in the share_recipe xml.
         mPostForm = rootView.findViewById(R.id.share_recipe_form);
         mProgressView = rootView.findViewById(R.id.share_progress);
-        mLocationView = (TextView) rootView.findViewById(R.id.location_textview);
-        mFetchAddressButton  = (Button) rootView.findViewById(R.id.fetch_adress_button);
 
-        // Set click listener for the buttons in the xml.
+        // Set click listener for the buttons in the share_recipe xml.
         ImageView backButton = (ImageView) rootView.findViewById(R.id.back_button);
         Button shareButton = (Button) rootView.findViewById(R.id.share_recipe_button);
+        Button mFetchAddressButton = (Button) rootView.findViewById(R.id.fetch_adress_button);
         shareButton.setOnClickListener(clickListener);
         backButton.setOnClickListener(clickListener);
         mFetchAddressButton.setOnClickListener(clickListener);
 
-
-        // Find the editTextViews in the xml where the user should add information about the recipe.
+        // Find the TextViews in the xml where the user should add information about the recipe.
         mRecipeNameView = (EditText) rootView.findViewById(R.id.recipe_name_field_share_recipe);
         mRecipeInfoView = (EditText) rootView.findViewById(R.id.recipe_information_share_recipe);
         mPostInfoView = (EditText) rootView.findViewById(R.id.post_information_share_recipe);
+        mLocationView = (TextView) rootView.findViewById(R.id.location_textview_share_recipe);
 
-        // Set focusable on views to true.
+        // Set focusable on views to true, so we can set focus on them if the input is wrong.
         mRecipeNameView.setFocusable(true);
         mPostInfoView.setFocusable(true);
         mRecipeInfoView.setFocusable(true);
@@ -152,24 +171,26 @@ public class ShareRecipeFragment extends Fragment implements GoogleApiClient.Con
         return rootView;
     }
 
-    // Click listener for the buttons in the xml (Back button and share recipe button)
+    // Click listener for the buttons in the xml (Back button, share recipe button and fetchAddressButton).
     View.OnClickListener clickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
+            // Check if the user clicked on fetchAdressButton.
             if (view.getId() == R.id.fetch_adress_button){
                 final LocationManager manager = (LocationManager) getActivity().getSystemService( Context.LOCATION_SERVICE );
 
+                // Check if the gps is activated. If the gps is not active tell the user with a toast.
+                // Else set the LocationRequested flag to true and connect to the service.
                 if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER ) ) {
                     Toast noGps = Toast.makeText(getActivity(), "Your GPS is don't activated. Activate it and try again.", Toast.LENGTH_LONG);
                     noGps.show();
                 }else{
+                    mLocationRequested = true;
                     mGoogleApiClient.connect();
-                    mAddressRequested = true;
                 }
 
             }
             // Check if the user clicked on the share recipe button.
-            // If not, the user clicked on the back button and then we pass the click to the MainActivity.
             else if (view.getId() == R.id.share_recipe_button) {
                 // Hide the keyboard.
                 hideKeyboard();
@@ -183,6 +204,13 @@ public class ShareRecipeFragment extends Fragment implements GoogleApiClient.Con
                 mRecipeName = mRecipeNameView.getText().toString();
                 mRecipeInformation = mRecipeInfoView.getText().toString();
                 mPostInformation = mPostInfoView.getText().toString();
+
+                // Check if the user added a location to his recipe or not.
+                if (mLocationRequested){
+                    mLocationInformation = mLocationView.getText().toString();
+                }else{
+                    mLocationInformation = "Not added";
+                }
 
                 // Check if the entered information is valid or not.
                 // If it is valid, then do one http request to send the data to the database.
@@ -204,7 +232,9 @@ public class ShareRecipeFragment extends Fragment implements GoogleApiClient.Con
                     mRecipeNameView.setError("Have you entered a recipe name? Check if it contains less than 30 letters.");
                     mRecipeNameView.requestFocus();
                 }
-            }else{
+            }
+            // The user clicked on the back button and then we pass the click to the MainActivity via interface listener.
+            else{
                 hideKeyboard();
                 mListener.onButtonClicked(view);
             }
@@ -216,7 +246,6 @@ public class ShareRecipeFragment extends Fragment implements GoogleApiClient.Con
      */
     private boolean infoIsValid(String information) {
         return !information.trim().isEmpty() && !information.isEmpty();
-
     }
 
     /**
@@ -230,8 +259,11 @@ public class ShareRecipeFragment extends Fragment implements GoogleApiClient.Con
      * Hides the keyboard.
      */
     private void hideKeyboard() {
-        final InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(getView().getWindowToken(), 0);
+        View view = getActivity().getCurrentFocus();
+        if (view != null) {
+            InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+            inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+        }
     }
 
     /**
@@ -279,9 +311,7 @@ public class ShareRecipeFragment extends Fragment implements GoogleApiClient.Con
             if (!Geocoder.isPresent()) {
                 return;
             }
-            if (mAddressRequested) {
-                startIntentService();
-            }
+            startIntentService();
         }
     }
 
@@ -294,7 +324,6 @@ public class ShareRecipeFragment extends Fragment implements GoogleApiClient.Con
 
     private void displayAddressOutput() {
         mLocationView.setText(mAddressOutput);
-        mAddressRequested = false;
     }
 
     protected synchronized void buildGoogleApiClient() {
@@ -321,7 +350,6 @@ public class ShareRecipeFragment extends Fragment implements GoogleApiClient.Con
 
         @Override
         protected void onReceiveResult(int resultCode, Bundle resultData) {
-
             // Display the address string
             // or an error message sent from the intent service.
             mAddressOutput = resultData.getString(Constants.RESULT_DATA_KEY);
@@ -398,7 +426,8 @@ public class ShareRecipeFragment extends Fragment implements GoogleApiClient.Con
                 jsonObject.accumulate("post_information", mPostInformation);
                 jsonObject.accumulate("recipe_information", mRecipeInformation);
                 jsonObject.accumulate("recipe_name", mRecipeName);
-                jsonObject.accumulate("user_id",ActivatedUser.activatedUserID);
+                jsonObject.accumulate("user_id", ActivatedUser.activatedUserID);
+                jsonObject.accumulate("location", mLocationInformation);
                 // Convert JSONObject to JSON to String
                 json = jsonObject.toString();
                 // Set json to StringEntity

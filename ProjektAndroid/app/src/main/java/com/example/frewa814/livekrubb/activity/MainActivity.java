@@ -21,6 +21,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.SearchView;
 
 import com.example.frewa814.livekrubb.R;
+import com.example.frewa814.livekrubb.adapters.SearchUserAdapter;
 import com.example.frewa814.livekrubb.asynctask.GetTask;
 import com.example.frewa814.livekrubb.comment.CommentFragment;
 import com.example.frewa814.livekrubb.flow.FollowersFlowListFragment;

@@ -11,23 +11,25 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.example.frewa814.livekrubb.R;
-import com.example.frewa814.livekrubb.gps.Constants;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+
 /**
- * Created by Fredrik on 2015-05-06.
+ * This class extends IntentService. This class is my address lookup service.
+ * The service uses a GeoCoder to fetch the address for the location, and sends the results to the ResultReceiver.
  */
 public class FetchAddressIntentService extends IntentService {
 
     protected ResultReceiver mReceiver;
     private static final String TAG = "fetch-address-intent-service";
+    private static final String LOG_TAG = "fetch-add-int-service";
 
     public FetchAddressIntentService() {
-        super("fetch-address-intent-service");
+        super(TAG);
     }
 
     void deliverResultToReceiver(int resultCode, String message) {
@@ -36,6 +38,10 @@ public class FetchAddressIntentService extends IntentService {
         mReceiver.send(resultCode, bundle);
     }
 
+    /**
+     * Will be running when the user clicks on add location button
+     * in the ShareRecipeFragment layout.
+     */
     @Override
     protected void onHandleIntent(Intent intent) {
         String errorMessage = "";
@@ -57,11 +63,11 @@ public class FetchAddressIntentService extends IntentService {
         } catch (IOException ioException) {
             // Catch network or other I/O problems.
             errorMessage = getString(R.string.service_not_available);
-            Log.e(TAG, errorMessage, ioException);
+            Log.e(LOG_TAG, errorMessage, ioException);
         } catch (IllegalArgumentException illegalArgumentException) {
             // Catch invalid latitude or longitude values.
             errorMessage = getString(R.string.invalid_lat_long_used);
-            Log.e(TAG, errorMessage + ". " +
+            Log.e(LOG_TAG, errorMessage + ". " +
                     "Latitude = " + location.getLatitude() +
                     ", Longitude = " +
                     location.getLongitude(), illegalArgumentException);
@@ -71,7 +77,7 @@ public class FetchAddressIntentService extends IntentService {
         if (addresses == null || addresses.size()  == 0) {
             if (errorMessage.isEmpty()) {
                 errorMessage = getString(R.string.no_address_found);
-                Log.e(TAG, errorMessage);
+                Log.e(LOG_TAG, errorMessage);
             }
             deliverResultToReceiver(Constants.FAILURE_RESULT, errorMessage);
         } else {
@@ -83,7 +89,7 @@ public class FetchAddressIntentService extends IntentService {
             for(int i = 0; i < address.getMaxAddressLineIndex(); i++) {
                 addressFragments.add(address.getAddressLine(i));
             }
-            Log.i(TAG, getString(R.string.address_found));
+            Log.i(LOG_TAG, getString(R.string.address_found));
             deliverResultToReceiver(Constants.SUCCESS_RESULT,
                     TextUtils.join(System.getProperty("line.separator"),
                             addressFragments));

@@ -1,4 +1,4 @@
-package com.example.frewa814.livekrubb.comment;
+package com.example.frewa814.livekrubb.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -8,6 +8,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.example.frewa814.livekrubb.R;
+import com.example.frewa814.livekrubb.comment.CommentListData;
 import com.example.frewa814.livekrubb.misc.ActivatedUser;
 import com.example.frewa814.livekrubb.misc.AutoResizeTextView;
 import com.example.frewa814.livekrubb.misc.OnButtonClickedListener;

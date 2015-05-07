@@ -1,4 +1,4 @@
-package com.example.frewa814.livekrubb.login;
+package com.example.frewa814.livekrubb.activity;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -11,22 +11,14 @@ import android.os.AsyncTask;
 
 import android.os.Build;
 import android.os.Bundle;
-import android.text.TextUtils;
-import android.view.KeyEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.frewa814.livekrubb.asynctask.GetTask;
 import com.example.frewa814.livekrubb.misc.ActivatedUser;
-import com.example.frewa814.livekrubb.activity.MainActivity;
 import com.example.frewa814.livekrubb.R;
-import com.example.frewa814.livekrubb.activity.LoadingScreenActivity;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -39,89 +31,87 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.concurrent.ExecutionException;
-
 
 /**
- * A login screen that offers login via email/password and via Google+ sign in.
- * <p/>
- * ************ IMPORTANT SETUP NOTES: ************
- * In order for Google+ sign in to work with your app, you must first go to:
- * https://developers.google.com/+/mobile/android/getting-started#step_1_enable_the_google_api
- * and follow the steps in "Step 1" to create an OAuth 2.0 client for your package.
+ * A login screen that offers login via username and password.
  */
 public class LoginActivity extends Activity {
-
 
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
     private UserLoginTask mAuthTask = null;
 
-    // UI references.
+    /**
+     * UI references
+     */
     private EditText mUsernameView;
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
 
+    /**
+     * Constant tags for http requests.
+     */
     private final static String USER_TAG = "user";
     private final static String PASSWORD_TAG = "password";
+
+    private String mUsername;
+    private String mPassword;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Set layout to activity login.
         setContentView(R.layout.activity_login);
 
-
         // Set up the login form.
-        mUsernameView = (EditText) findViewById(R.id.usernameField);
-
-        mPasswordView = (EditText) findViewById(R.id.password);
-        mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                if (id == R.id.login || id == EditorInfo.IME_NULL) {
-
-                    attemptLogin();
-                    return true;
-                }
-                return false;
-            }
-        });
-
-        Button mSignInButton = (Button) findViewById(R.id.sign_in_button);
-        mSignInButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                attemptLogin();
-            }
-        });
-
-        Button mRegisterButton = (Button) findViewById(R.id.register_button);
-        mRegisterButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                registerUser();
-            }
-        });
-
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
-    }
 
-    private void registerUser() {
-        finish();
-        Intent registerScreen = new Intent(getApplicationContext(), RegisterActivity.class);
-        startActivity(registerScreen);
-    }
+        // Find the views for username and password.
+        mUsernameView = (EditText) findViewById(R.id.usernameField);
+        mPasswordView = (EditText) findViewById(R.id.password);
 
+        // Find the signInButton in the xml and set a click listener on it.
+        // When the user click on the button, try to do a login.
+        Button signInButton = (Button) findViewById(R.id.sign_in_button);
+        signInButton.setOnClickListener(clickListener);
+
+        // Find the registerButton in the xml and set a click listener on it.
+        // When a user click on the button, change activity to registerActivity.
+        Button mRegisterButton = (Button) findViewById(R.id.register_button);
+        mRegisterButton.setOnClickListener(clickListener);
+    }
 
     /**
-     * Attempts to sign in.
-     * If there are form errors (invalid email, missing fields, etc.), the
-     * errors are presented and no actual login attempt is made.
+     * Click listener for register and sign in button.
+     * Checks which button is clicked and than do the right thing.
+     */
+    View.OnClickListener clickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            // Attempt to login.
+            if (view.getId() == R.id.sign_in_button){
+                attemptLogin();
+            }
+            // Change to register activity.
+            else if (view.getId() == R.id.register_button){
+                finish();
+                Intent registerScreen = new Intent(getApplicationContext(), RegisterActivity.class);
+                startActivity(registerScreen);
+            }
+        }
+    };
+
+    /**
+     * Attempts to login.
+     * If there are form errors (invalid email, missing fields, etc.),
+     * the errors are presented for the user and no actual login attempt is made.
      */
     public void attemptLogin() {
+        // First of all we hide the keyboard so the user see whats happening.
         hideKeyboard();
 
         if (mAuthTask != null) {
@@ -133,22 +123,21 @@ public class LoginActivity extends Activity {
         mPasswordView.setError(null);
 
         // Store values at the time of the login attempt.
-        String username = mUsernameView.getText().toString();
-        String password = mPasswordView.getText().toString();
+        mUsername = mUsernameView.getText().toString();
+        mPassword = mPasswordView.getText().toString();
 
         boolean cancel = false;
         View focusView = null;
 
-
-        // Check for a valid password, if the user entered one.
-        if (!isPasswordValid(password)) {
+        // Check for a valid password.
+        if (!isInputValid(mPassword)) {
             mPasswordView.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordView;
             cancel = true;
         }
 
         // Check for a valid username.
-        if (!isUsernameValid(username)) {
+        if (!isInputValid(mUsername)) {
             mUsernameView.setError(getString(R.string.error_invalid_username));
             focusView = mUsernameView;
             cancel = true;
@@ -162,17 +151,18 @@ public class LoginActivity extends Activity {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            mAuthTask = new UserLoginTask(username, password);
+            mAuthTask = new UserLoginTask();
             mAuthTask.execute((Void) null);
         }
     }
 
-    private boolean isUsernameValid(String username) {
-        return username.length() > 4 && !username.contains(" ");
-    }
-
-    private boolean isPasswordValid(String password) {
-        return password.length() > 4  && !password.contains(" ");
+    /**
+     * Check if the input username and password is valid.
+     * @param input is username or password.
+     * @return boolean true or false depend if the input is valid or not.
+     */
+    private boolean isInputValid(String input) {
+        return input.length() > 4 && !input.contains(" ");
     }
 
     /**
@@ -211,20 +201,21 @@ public class LoginActivity extends Activity {
         }
     }
 
-
+    /**
+     * Calling this when i want to hide the keyboard.
+     */
+    private void hideKeyboard() {
+        View view = this.getCurrentFocus();
+        if (view != null) {
+            InputMethodManager inputManager = (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);
+            inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+        }
+    }
 
     /**
      * Represents an asynchronous login task used to authenticate the user.
      */
     private class UserLoginTask extends AsyncTask<Void, Void, String> {
-
-        private final String mUsername;
-        private final String mPassword;
-
-        UserLoginTask(String username, String password) {
-            mUsername = username;
-            mPassword = password;
-        }
 
         @Override
         protected String doInBackground(Void... params) {
@@ -243,7 +234,7 @@ public class LoginActivity extends Activity {
             }
 
             try {
-                // If we don't got any return from the database, the user enter wrong username
+                // If we don't got any return from the database (length of array is 0), the user enter wrong username
                 jsonObject = new JSONObject(user);
                 JSONArray jsonArray = jsonObject.getJSONArray(USER_TAG);
                 if (jsonArray.length() == 0) {
@@ -253,6 +244,8 @@ public class LoginActivity extends Activity {
                 // Check if the user entered right password.
                 object = jsonArray.getJSONObject(0);
                 if (mPassword.equals(object.getString(PASSWORD_TAG))) {
+                    // The user entered right password so then we can create a new object
+                    // ActivatedUser so I know who is logged in.
                     new ActivatedUser(object);
                 } else {
                     return "wrong password";
@@ -272,6 +265,7 @@ public class LoginActivity extends Activity {
 
             switch (result) {
                 case "server error":
+                    // Inform the user that something is wrong with the server.
                     Toast serverError = Toast.makeText(getApplicationContext(), "Server Error, please try again!", Toast.LENGTH_LONG);
                     serverError.show();
                     break;
@@ -287,61 +281,55 @@ public class LoginActivity extends Activity {
                     mUsernameView.requestFocus();
                     break;
                 default:
+                    // Default is wrong password.
                     mPasswordView.setError(getString(R.string.error_incorrect_password));
                     mPasswordView.requestFocus();
                     break;
             }
         }
 
+        /**
+         * This method will do one http request and get the user from the database
+         * with a given username that the user entered.
+         */
+        private String getUser(String username) {
+            InputStream inputStream;
+            String result;
+            try {
+                DefaultHttpClient httpClient = new DefaultHttpClient();
+                HttpGet httpget = new HttpGet(MainActivity.URL + "/get_user/" + username);
+                HttpResponse response;
+                response = httpClient.execute(httpget);
+
+                inputStream = response.getEntity().getContent();
+                result = convertInputStreamToString(inputStream);
+
+            } catch (Exception e) {
+                result = "server error";
+                e.printStackTrace();
+            }
+
+            return result;
+        }
+
+        /**
+         * Convert the inputStream to a readable string.
+         */
+        private String convertInputStreamToString(InputStream inputStream) throws IOException {
+            BufferedReader bufferedReader = new BufferedReader( new InputStreamReader(inputStream));
+            String line;
+            String result = "";
+            while((line = bufferedReader.readLine()) != null)
+                result += line;
+
+            inputStream.close();
+            return result;
+        }
+
         @Override
         protected void onCancelled() {
             mAuthTask = null;
             showProgress(false);
-        }
-    }
-
-    /**
-     * This method will do one http request and get the user from the database.
-     */
-    private String getUser(String username) {
-        InputStream inputStream;
-        String result;
-        try {
-            DefaultHttpClient httpClient = new DefaultHttpClient();
-            HttpGet httpget = new HttpGet(MainActivity.URL + "/get_user/" + username);
-            HttpResponse response;
-            response = httpClient.execute(httpget);
-
-            inputStream = response.getEntity().getContent();
-            result = convertInputStreamToString(inputStream);
-
-        } catch (Exception e) {
-            result = "server error";
-            e.printStackTrace();
-        }
-
-        return result;
-    }
-
-    /**
-     * Convert the inputstream to a readable string.
-     */
-    private String convertInputStreamToString(InputStream inputStream) throws IOException {
-        BufferedReader bufferedReader = new BufferedReader( new InputStreamReader(inputStream));
-        String line;
-        String result = "";
-        while((line = bufferedReader.readLine()) != null)
-            result += line;
-
-        inputStream.close();
-        return result;
-    }
-
-    private void hideKeyboard() {
-        View view = this.getCurrentFocus();
-        if (view != null) {
-            InputMethodManager inputManager = (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);
-            inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
         }
     }
 }

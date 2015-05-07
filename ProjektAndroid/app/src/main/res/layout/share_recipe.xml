@@ -126,7 +126,7 @@
                         android:id="@+id/fetch_adress_button" />
 
                     <TextView
-                        android:id="@+id/location_textview"
+                        android:id="@+id/location_textview_share_recipe"
                         android:layout_width="fill_parent"
                         android:layout_height="match_parent" />
 

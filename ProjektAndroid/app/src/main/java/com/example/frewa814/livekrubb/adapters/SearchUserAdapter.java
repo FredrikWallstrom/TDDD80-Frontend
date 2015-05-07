@@ -1,4 +1,4 @@
-package com.example.frewa814.livekrubb.activity;
+package com.example.frewa814.livekrubb.adapters;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -11,7 +11,7 @@ import com.example.frewa814.livekrubb.R;
 import java.util.List;
 
 /**
- * Adapter for the dropdown list for the search action in the actionbar.
+ * CursorAdapter for the dropdown list for the search action in the actionbar.
  */
 public class SearchUserAdapter extends CursorAdapter {
 

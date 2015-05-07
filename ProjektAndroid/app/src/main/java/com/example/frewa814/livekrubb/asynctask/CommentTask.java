@@ -3,6 +3,7 @@ package com.example.frewa814.livekrubb.asynctask;
 import android.os.AsyncTask;
 
 import com.example.frewa814.livekrubb.activity.MainActivity;
+import com.example.frewa814.livekrubb.misc.ActivatedUser;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -18,18 +19,18 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 /**
- * Created by Fredrik on 2015-05-04.
+ * Created by Fredrik on 2015-05-07.
  */
-public class FollowTask extends AsyncTask<Void, Void, String> {
+public class CommentTask extends AsyncTask<Void, Void, String> {
+
     private static final String RESULT_TAG = "result";
-    private String followerID;
-    private String followedID;
+    private String mPostID;
+    private String mCommentText;
 
-    public FollowTask(String followerID, String followedID) {
-        this.followedID = followedID;
-        this.followerID = followerID;
+    public CommentTask(String postID, String commentText) {
+        this.mPostID = postID;
+        this.mCommentText = commentText;
     }
-
     @Override
     protected String doInBackground(Void... params) {
         String result;
@@ -57,35 +58,42 @@ public class FollowTask extends AsyncTask<Void, Void, String> {
         return result;
     }
 
-    /**
-     * This method will make a post to the database and like or unlike one post
-     * depend if the user already like the post or not.
-     */
     public String makePost() {
         InputStream inputStream;
         String result;
         try {
             // Create HttpClient
             HttpClient httpclient = new DefaultHttpClient();
+
             // Make makePost request to the given URL
-            HttpPost httpPost = new HttpPost(MainActivity.URL + "/follow_user");
+            HttpPost httpPost = new HttpPost(MainActivity.URL + "/add_comment");
+
             String json;
+
             // Build jsonObject
             JSONObject jsonObject = new JSONObject();
-            jsonObject.accumulate("followerID", followerID);
-            jsonObject.accumulate("followedID", followedID);
+            jsonObject.accumulate("post_id", mPostID);
+            jsonObject.accumulate("user_id", ActivatedUser.activatedUserID);
+            jsonObject.accumulate("comment_text", mCommentText);
+
             // Convert JSONObject to JSON to String
             json = jsonObject.toString();
+
             // Set json to StringEntity
             StringEntity se = new StringEntity(json);
+
             // Set httpPost Entity
             httpPost.setEntity(se);
+
             // Execute makePost request to the given URL
             HttpResponse httpResponse = httpclient.execute(httpPost);
+
             // Receive response as inputStream.
             inputStream = httpResponse.getEntity().getContent();
+
             // Convert the inputStream to string.
             result = convertInputStreamToString(inputStream);
+
         } catch (Exception e) {
             result = "server error";
             e.printStackTrace();

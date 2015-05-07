@@ -1,14 +1,9 @@
 package com.example.frewa814.livekrubb.comment;
 
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-
 /**
- * Created by Fredrik on 2015-05-01.
+ * Used to create object with the data that's gonna represent the flow in the comment page.
  */
 public class CommentListData {
-
 
     String CommentAuthor;
     String CommentText;

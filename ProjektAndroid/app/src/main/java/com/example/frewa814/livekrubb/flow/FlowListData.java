@@ -3,7 +3,9 @@ package com.example.frewa814.livekrubb.flow;
 import org.json.JSONObject;
 
 /**
- * Used to create object with the data that's gonna represent the flow.
+ * Used to create object with the data that's gonna represent the flow in three pages.
+ * PublicFlowFragment, MyPageFragment and FollowersFlowListFragment.
+ * All three is using same list items and therefore same listAdapter (FlowListAdapter).
  */
 public class FlowListData {
     String postAuthor;
@@ -11,6 +13,7 @@ public class FlowListData {
     String postInformation;
     String postID;
     JSONObject recipe;
+    String location;
 
     public String getPostAuthor() {
         return postAuthor;
@@ -50,5 +53,13 @@ public class FlowListData {
 
     public String getPostID(){
         return postID;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
     }
 }

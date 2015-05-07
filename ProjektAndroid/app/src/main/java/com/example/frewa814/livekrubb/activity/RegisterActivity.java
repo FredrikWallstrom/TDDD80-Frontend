@@ -1,23 +1,21 @@
-package com.example.frewa814.livekrubb.login;
+package com.example.frewa814.livekrubb.activity;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.View;
-import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.frewa814.livekrubb.R;
-import com.example.frewa814.livekrubb.activity.MainActivity;
-import com.example.frewa814.livekrubb.login.LoginActivity;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -33,24 +31,38 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 /**
- * Created by Fredrik on 2015-03-30.
+ * A register screen that offer one user to register one account so he can use the application.
  */
 public class RegisterActivity extends Activity {
 
+    /**
+     * Constant tags for http requests.
+     */
     private static final String RESULT_TAG = "result";
+
+    /**
+     * EditText views in the xml.
+     */
     private EditText mUsernameView;
     private EditText mEmailView;
     private EditText mPasswordView;
+
+    /**
+     * This views is used to shoe the progress vies and than hide the register form view
+     * and vice versa.
+     */
     private View mProgressView;
     private View mRegisterForm;
-    private View focusView = null;
+
+    /**
+     * Strings that will represent the entered information from the user.
+     */
     private String mUsername;
     private String mEmail;
     private String mPassword;
 
-
     /**
-     * Keep track of the login task to ensure we can cancel it if requested.
+     * Keep track of the register task to ensure we can cancel it if requested.
      */
     private UserRegisterTask mAuthTask = null;
 
@@ -59,95 +71,133 @@ public class RegisterActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
         // Hide the keyboard when switch to this activity
-        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+        hideKeyboard();
 
+        // Set up the login form.
         mRegisterForm = findViewById(R.id.register_form);
         mProgressView = findViewById(R.id.register_progress);
 
+        // Find the EditText views in the xml.
         mUsernameView = (EditText) findViewById(R.id.register_username);
         mEmailView = (EditText) findViewById(R.id.register_email);
         mPasswordView = (EditText) findViewById(R.id.register_password);
 
+        // Find the backButton in the xml and set a click listener on it.
+        // When the user click on the button, switch back to login activity.
         Button mBackButton = (Button) findViewById(R.id.back_from_register_button);
-        mBackButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        mBackButton.setOnClickListener(clickListener);
+
+        // Find the registerButton in the xml and set a click listener on it.
+        // When the user click on the button, try to do a register attempt.
+        Button mRegisterButton = (Button) findViewById(R.id.register_button);
+        mRegisterButton.setOnClickListener(clickListener);
+    }
+
+    /**
+     * Click listener for register and back button.
+     * Checks which button is clicked and than do the right thing.
+     */
+    View.OnClickListener clickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            // Attempt to register one new user.
+            if (view.getId() == R.id.register_button) {
+                attemptRegister();
+
+            }
+            // Change back to the login screen.
+            else if (view.getId() == R.id.back_from_register_button) {
                 finish();
                 Intent loginScreen = new Intent(getApplicationContext(), LoginActivity.class);
                 startActivity(loginScreen);
             }
-        });
+        }
+    };
 
-        Button mRegisterButton = (Button) findViewById(R.id.register_button);
-        mRegisterButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                attemptRegister();
-            }
-        });
+    /**
+     * Calling this when i want to hide the keyboard.
+     */
+    private void hideKeyboard() {
+        View view = this.getCurrentFocus();
+        if (view != null) {
+            InputMethodManager inputManager = (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);
+            inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+        }
     }
 
-
+    /**
+     * Attempts to register one user.
+     * If there are form errors (invalid email, missing fields, etc.),
+     * the errors are presented for the user and no actual register attempt is made.
+     */
     public void attemptRegister() {
+        // Flag to know if we want to cancel the attempt or not.
+        boolean cancel = false;
+
+        // Reset the focusView.
+        View focusView = null;
+
         // Reset errors.
         mUsernameView.setError(null);
         mEmailView.setError(null);
         mPasswordView.setError(null);
 
         // Store values at the time of the login attempt.
-        String username = mUsernameView.getText().toString();
-        String email = mEmailView.getText().toString();
-        String password = mPasswordView.getText().toString();
-
-        boolean cancel = false;
-
+        mUsername = mUsernameView.getText().toString();
+        mEmail = mEmailView.getText().toString();
+        mPassword = mPasswordView.getText().toString();
 
         // Check for a valid password, if the user entered one.
-        if (!isPasswordValid(password)) {
+        if (!isInputValid(mPassword)) {
             mPasswordView.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordView;
             cancel = true;
         }
 
         // Check for a valid email address.
-        if (!isEmailValid(email)) {
+        if (!isEmailValid(mEmail)) {
             mEmailView.setError(getString(R.string.error_invalid_email));
             focusView = mEmailView;
             cancel = true;
         }
 
         // Check for a valid username, if the user entered one.
-        if (!isUsernameValid(username)) {
+        if (!isInputValid(mUsername)) {
             mUsernameView.setError(getString(R.string.error_invalid_username));
             focusView = mUsernameView;
             cancel = true;
         }
 
         if (cancel) {
-            // There was an error; don't attempt login and focus the first
+            // There was an error; don't attempt to register and focus the first
             // form field with an error.
             focusView.requestFocus();
         } else {
             // Show a progress spinner, and kick off a background task to
-            // perform the user login attempt.
+            // perform the user register attempt.
             showProgress(true);
-            mAuthTask = new UserRegisterTask(username, email, password);
+            mAuthTask = new UserRegisterTask();
             mAuthTask.execute((Void) null);
         }
     }
 
-    private boolean isUsernameValid(String username) {
-        return username.length() > 4 && !username.contains(" ");
+    /**
+     * Check if the input username and password is valid.
+     * @param input is username or password.
+     * @return boolean true or false depend if the input is valid or not.
+     */
+    private boolean isInputValid(String input) {
+        return input.length() > 4 && !input.contains(" ");
     }
 
+    /**
+     * Check if the input email is valid.
+     * @param email is the entered email address from user.
+     * @return boolean true or false depend if the email is valid or not.
+     */
     private boolean isEmailValid(String email) {
         return email.length() > 4 && email.contains("@") && !email.contains(" ");
     }
-
-    private boolean isPasswordValid(String password) {
-        return password.length() > 4 && !password.contains(" ");
-    }
-
 
     /**
      * Shows the progress UI and hides the register form
@@ -185,87 +235,22 @@ public class RegisterActivity extends Activity {
         }
     }
 
-    /**
-     * Do a http request and make a post to the database with the user information.
-     */
-    public String makePost(String url) {
-        InputStream inputStream;
-        String result;
-        try {
-            // Create HttpClient
-            HttpClient httpclient = new DefaultHttpClient();
-
-            // Make makePost request to the given URL
-            HttpPost httpPost = new HttpPost(url);
-
-            String json;
-
-            // Build jsonObject
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.accumulate("username", mUsername);
-            jsonObject.accumulate("email", mEmail);
-            jsonObject.accumulate("password", mPassword);
-
-            // Convert JSONObject to JSON to String
-            json = jsonObject.toString();
-
-            // Set json to StringEntity
-            StringEntity se = new StringEntity(json);
-
-            // Set httpPost Entity
-            httpPost.setEntity(se);
-
-            // Execute makePost request to the given URL
-            HttpResponse httpResponse = httpclient.execute(httpPost);
-
-            // Receive response as inputStream.
-            inputStream = httpResponse.getEntity().getContent();
-
-            // Convert the inputStream to string.
-            result = convertInputStreamToString(inputStream);
-
-        } catch (Exception e) {
-            result = "server error";
-            e.printStackTrace();
-        }
-
-        return result;
-    }
-
-    private String convertInputStreamToString(InputStream inputStream) throws IOException {
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-        String line;
-        String result = "";
-        while ((line = bufferedReader.readLine()) != null)
-            result += line;
-
-        inputStream.close();
-        return result;
-    }
 
     /**
-     * Private anonymous class that will do one asyncTask so we can handle the http requoest
+     * Private anonymous class that will do one asyncTask so we can handle the http request
      * and add the user to the database.
      */
     private class UserRegisterTask extends AsyncTask<Void, Void, String> {
 
-        UserRegisterTask(String username, String email, String password) {
-            mUsername = username;
-            mEmail = email;
-            mPassword = password;
-        }
-
         @Override
         protected String doInBackground(Void... params) {
             String result;
-
             try {
                 // Simulate network access.
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-
             // Try to register the new account
             String dict = makePost(MainActivity.URL + "/add_user");
 
@@ -285,6 +270,7 @@ public class RegisterActivity extends Activity {
             mAuthTask = null;
             showProgress(false);
 
+            // Check what the post to the server returned and inform the user if something went wrong.
             switch (result) {
                 case "server error":
                     Toast serverError = Toast.makeText(getApplicationContext(), "Server Error, please try again!", Toast.LENGTH_LONG);
@@ -299,6 +285,7 @@ public class RegisterActivity extends Activity {
                     mUsernameView.requestFocus();
                     break;
                 default:
+                    // default is that the registration has succeed, switch activity back to the login screen.
                     Toast succeed = Toast.makeText(getApplicationContext(), "The registration has succeed!", Toast.LENGTH_LONG);
                     succeed.show();
                     finish();
@@ -306,6 +293,56 @@ public class RegisterActivity extends Activity {
                     startActivity(loginScreen);
                     break;
             }
+        }
+
+        /**
+         * Do a http request and make a post to the database with the user information.
+         */
+        public String makePost(String url) {
+            InputStream inputStream;
+            String result;
+            try {
+                // Create HttpClient
+                HttpClient httpclient = new DefaultHttpClient();
+                // Make makePost request to the given URL
+                HttpPost httpPost = new HttpPost(url);
+                String json;
+                // Build jsonObject
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.accumulate("username", mUsername);
+                jsonObject.accumulate("email", mEmail);
+                jsonObject.accumulate("password", mPassword);
+                // Convert JSONObject to JSON to String
+                json = jsonObject.toString();
+                // Set json to StringEntity
+                StringEntity se = new StringEntity(json);
+                // Set httpPost Entity
+                httpPost.setEntity(se);
+                // Execute makePost request to the given URL
+                HttpResponse httpResponse = httpclient.execute(httpPost);
+                // Receive response as inputStream.
+                inputStream = httpResponse.getEntity().getContent();
+                // Convert the inputStream to string.
+                result = convertInputStreamToString(inputStream);
+            } catch (Exception e) {
+                result = "server error";
+                e.printStackTrace();
+            }
+            return result;
+        }
+
+        /**
+         * Convert the inputStream to a readable string.
+         */
+        private String convertInputStreamToString(InputStream inputStream) throws IOException {
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+            String line;
+            String result = "";
+            while ((line = bufferedReader.readLine()) != null)
+                result += line;
+
+            inputStream.close();
+            return result;
         }
 
         @Override

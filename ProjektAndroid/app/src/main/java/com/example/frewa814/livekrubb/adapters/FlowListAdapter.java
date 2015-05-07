@@ -1,4 +1,4 @@
-package com.example.frewa814.livekrubb.flow;
+package com.example.frewa814.livekrubb.adapters;
 
 import android.app.Fragment;
 import android.content.Context;
@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.example.frewa814.livekrubb.flow.FlowListData;
 import com.example.frewa814.livekrubb.misc.ActivatedUser;
 import com.example.frewa814.livekrubb.misc.AutoResizeTextView;
 import com.example.frewa814.livekrubb.asynctask.GetTask;
@@ -26,6 +27,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -100,6 +102,7 @@ public class FlowListAdapter extends BaseAdapter {
             mViewHolder.commentButton = (Button) convertView.findViewById(R.id.comment_button);
             mViewHolder.displayLikesView = (TextView) convertView.findViewById(R.id.likes_count);
             mViewHolder.displayCommentsView = (TextView) convertView.findViewById(R.id.comments_count);
+            mViewHolder.displayLocationView = (TextView) convertView.findViewById(R.id.location_view_flow_item);
 
             // Store the holder with the view.
             convertView.setTag(mViewHolder);
@@ -114,6 +117,7 @@ public class FlowListAdapter extends BaseAdapter {
         mViewHolder.postAuthorView.setText(flowListData.getPostAuthor());
         mViewHolder.postInformationView.setText(flowListData.getPostInformation());
         mViewHolder.recipeButton.setText(flowListData.getRecipeName());
+        mViewHolder.displayLocationView.setText(flowListData.getLocation());
 
         // Get the postID
         String postID = flowListData.getPostID();
@@ -309,7 +313,8 @@ public class FlowListAdapter extends BaseAdapter {
      * ViewHolder for all views in one list item.
      */
     private static class MyViewHolder {
-        TextView postAuthorView, postInformationView, displayCommentsView, displayLikesView;
+        TextView postAuthorView, postInformationView, displayCommentsView,
+                displayLikesView, displayLocationView;
         Button recipeButton, likeButton, commentButton;
     }
 

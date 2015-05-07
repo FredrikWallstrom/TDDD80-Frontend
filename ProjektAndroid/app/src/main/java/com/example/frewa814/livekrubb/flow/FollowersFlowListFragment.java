@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import com.example.frewa814.livekrubb.R;
 import com.example.frewa814.livekrubb.activity.MainActivity;
+import com.example.frewa814.livekrubb.adapters.FlowListAdapter;
 import com.example.frewa814.livekrubb.asynctask.GetTask;
 import com.example.frewa814.livekrubb.misc.ActivatedUser;
 import com.example.frewa814.livekrubb.misc.OnButtonClickedListener;
@@ -38,6 +39,7 @@ public class FollowersFlowListFragment extends ListFragment {
     private static final String USER_ID_TAG = "user_id";
     private static final String USERNAME_TAG = "username";
     private static final String USER_TAG = "user";
+    private static final String LOCATION_TAG = "location";
 
     private ArrayList myList;
 
@@ -84,6 +86,7 @@ public class FollowersFlowListFragment extends ListFragment {
         List<String> postAuthorList = new ArrayList<>();
         List<String> postIDList = new ArrayList<>();
         List<JSONObject> recipeList = new ArrayList<>();
+        List<String> locationList = new ArrayList<>();
         myList = new ArrayList();
         JSONArray posts;
         JSONArray followersArray;
@@ -121,9 +124,11 @@ public class FollowersFlowListFragment extends ListFragment {
                                     String postInformation = postObject.getString(POST_INFORMATION_TAG);
                                     String postAuthorID = postObject.getString(POST_AUTHOR_ID_TAG);
                                     String postID = postObject.getString(ID_TAG);
+                                    String location = postObject.getString(LOCATION_TAG);
 
                                     String postAuthor = getPostAuthor(postAuthorID);
 
+                                    locationList.add(location);
                                     postIDList.add(postID);
                                     recipeNameList.add(recipeName);
                                     postInformationList.add(postInformation);
@@ -158,6 +163,7 @@ public class FollowersFlowListFragment extends ListFragment {
             flowListData.setPostInformation(postInformationList.get(loopInteger));
             flowListData.setPostID(postIDList.get(loopInteger));
             flowListData.setRecipe(recipeList.get(loopInteger));
+            flowListData.setLocation(locationList.get(loopInteger));
 
             // Add this object into the ArrayList myList
             myList.add(flowListData);

@@ -6,22 +6,27 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
 import com.example.frewa814.livekrubb.R;
-import com.example.frewa814.livekrubb.login.LoginActivity;
 
 /**
  * An activity that will display an loading screen between activity shifts.
  * This is used when a user logging and when a user log out.
- * This is for the user to se that something is happening.
+ * This is for the user to see that something is happening.
  */
 public class LoadingScreenActivity extends Activity {
-    //Introduce an delay
-    private final int WAIT_TIME = 1500;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Wait time for how long we want to wait before we deploy next activity.
+        int WAIT_TIME = 1500;
+
+        // Set the layout xml.
         setContentView(R.layout.loading_screen);
+
+        // Find the progress spinner.
         findViewById(R.id.mainSpinner1).setVisibility(View.VISIBLE);
 
+        // Delay handler.
         new Handler().postDelayed(new Runnable(){
             @Override
             public void run() {

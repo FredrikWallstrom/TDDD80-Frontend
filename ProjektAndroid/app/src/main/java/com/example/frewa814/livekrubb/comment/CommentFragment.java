@@ -2,7 +2,6 @@ package com.example.frewa814.livekrubb.comment;
 
 import android.app.ActionBar;
 import android.app.Activity;
-import android.app.Fragment;
 import android.app.ListFragment;
 import android.content.Context;
 import android.os.AsyncTask;
@@ -18,6 +17,8 @@ import android.widget.Toast;
 
 import com.example.frewa814.livekrubb.R;
 import com.example.frewa814.livekrubb.activity.MainActivity;
+import com.example.frewa814.livekrubb.adapters.CommentListAdapter;
+import com.example.frewa814.livekrubb.asynctask.CommentTask;
 import com.example.frewa814.livekrubb.asynctask.GetTask;
 import com.example.frewa814.livekrubb.misc.ActivatedUser;
 import com.example.frewa814.livekrubb.misc.OnButtonClickedListener;
@@ -36,8 +37,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -48,18 +47,19 @@ public class CommentFragment extends ListFragment {
 
     private static final String USER_TAG = "user";
     private static final String USERNAME_TAG = "username";
-    private static final String RESULT_TAG = "result";
     OnButtonClickedListener mListener;
 
-    private static final String COMMENT_TAG = "comments";
+    private static final String COMMENTS_TAG = "comments";
     private static final String USER_ID_TAG = "user_id";
     private static final String COMMENT_TEXT_TAG = "comment_text";
 
     private EditText mCommentView;
-    private ArrayList myList;
+    private ArrayList<CommentListData> myList;
 
     private String mCommentText;
     private String mPostID;
+
+    private CommentListAdapter adapter;
 
     @Override
     public void onAttach(Activity activity) {
@@ -69,7 +69,7 @@ public class CommentFragment extends ListFragment {
         if (actionBar != null) {
             actionBar.hide();
         }
-
+        // Make sure MainActivity is implementing the OnButtonClickedListener interface.
         try {
             mListener = (OnButtonClickedListener) activity;
         } catch (ClassCastException e) {
@@ -80,97 +80,134 @@ public class CommentFragment extends ListFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+        // Inflate the layout for this fragment.
         View rootView = inflater.inflate(R.layout.comments, container, false);
 
-        // Set button listener for the share recipe button.
+        // Set click listener for the buttons in the xml (back button and add comment button).
         Button commentButton = (Button) rootView.findViewById(R.id.comment);
         ImageView backButton = (ImageView) rootView.findViewById(R.id.back_button);
         backButton.setOnClickListener(clickListener);
         commentButton.setOnClickListener(clickListener);
 
+        // Get the EditTextView for where the user can enter a comment.
         mCommentView = (EditText) rootView.findViewById(R.id.comment_edit_text_view);
-
 
         return rootView;
     }
 
+    /**
+     * Click listener for the back button and the button that will add a comment.
+     * Checks which button is clicked and than do the right thing.
+     * If the back button is clicked we gonna notify the MainActivity
+     * and then the activity will handle it.
+     */
     View.OnClickListener clickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
+            // Result string from the AsyncTask.
+            String result;
+
+            // Hide the keyboard so the user can see the whole display.
             hideKeyboard();
+
+            // Reset errors.
+            mCommentView.setError(null);
+
+            // Check if the clicked button was tha add comment button.
             if (view.getId() == R.id.comment) {
+
+                // Get the comment text that the user entered.
                 mCommentText = mCommentView.getText().toString();
-                String result;
 
-                try {
-                    MakeCommentTask task = new MakeCommentTask();
-                    result = task.execute().get();
-                } catch (InterruptedException | ExecutionException e) {
-                    result = "server error";
-                    e.printStackTrace();
+                // Check if the user entered a valid comment.
+                if (commentTextIsValid(mCommentText)){
+                    // Make a CommentTask that will save the comment in the database.
+                    try {
+                        CommentTask task = new CommentTask(mPostID, mCommentText);
+                        result = task.execute().get();
+                    } catch (InterruptedException | ExecutionException e) {
+                        result = "server error";
+                        e.printStackTrace();
+                    }
+                    // Check if everything went OK in the AsyncTask.
+                    if (!result.equals("server error")) {
+                        refreshFragment();
+                    }
                 }
-
-                if (!result.equals("server error")) {
-                    refreshFragment();
+                // If the user don't entered a valid Comment,
+                // notify the user by set error on the commentView.
+                else {
+                    mCommentView.setError("Have you entered a comment?, check if it not only contains spaces");
+                    mCommentView.requestFocus();
                 }
-            }else{
+            }
+            // If the clicked button don't was the add comment button
+            // It was the back button, and then "send" the click to MainActivity.
+            else {
                 mListener.onButtonClicked(view);
             }
 
         }
     };
 
-    private void hideKeyboard() {
-        View view = getActivity().getCurrentFocus();
-        if (view != null) {
-            InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-            inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-        }
+    /**
+     * Check if the entered comment text is valid or not.
+     */
+    private boolean commentTextIsValid(String commentText) {
+        return !commentText.trim().isEmpty() && !commentText.isEmpty();
     }
 
+    /**
+     * Running when creating the fragment.
+     * It will run the getDataInList method to get all the data that gonna
+     * represent the listView.
+     */
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-
-
+        // Get the post id from the bundle so we know which commentPage
+        // we gonna display.
         mPostID = getArguments().getString("post_id");
-
-
 
         // Get all posts in the database that's gonna represent the flow.
         getDataInList();
 
-        // Make custom adapter and set it to the listview.
-        CommentListAdapter adapter = new CommentListAdapter(getActivity(), myList);
+        // Make custom adapter and set it to the listView.
+        adapter = new CommentListAdapter(getActivity(), myList);
         setListAdapter(adapter);
     }
 
+    /**
+     * This method will get all data that is gonna represent the flow.
+     * It will add the data to temp lists and then create one CommentListData
+     * object for every items in the temp list.
+     * And after that it will add the object to the list that will
+     * be sent to the CommentListAdapter.
+     */
     private void getDataInList() {
         List<String> commentAuthorList = new ArrayList<>();
         List<String> commentTextList = new ArrayList<>();
-        myList = new ArrayList();
+        myList = new ArrayList<>();
         JSONArray comments;
 
         try {
             comments = getAllComments();
             if (comments != null) {
-                if (comments.length() != 0) {
+                for (int i = 0; i < comments.length(); i++) {
+                    JSONObject object = comments.getJSONObject(i);
 
-                    for (int i = 0; i < comments.length(); i++) {
-                        JSONObject object = comments.getJSONObject(i);
+                    String commentAuthorID = object.getString(USER_ID_TAG);
+                    String commentText = object.getString(COMMENT_TEXT_TAG);
 
-                        String commentAuthorID = object.getString(USER_ID_TAG);
-                        String commentText = object.getString(COMMENT_TEXT_TAG);
+                    String commentAuthor = getCommentAuthor(commentAuthorID);
 
-                        String commentAuthor = getCommentAuthor(commentAuthorID);
-
-                        commentAuthorList.add(commentAuthor);
-                        commentTextList.add(commentText);
-                    }
+                    commentAuthorList.add(commentAuthor);
+                    commentTextList.add(commentText);
                 }
-            } else {
+            }
+            // If there is problem with the server.
+            else {
                 Toast serverError = Toast.makeText(getActivity(), "Failed to update, Try again!", Toast.LENGTH_LONG);
                 serverError.show();
             }
@@ -192,7 +229,9 @@ public class CommentFragment extends ListFragment {
         }
     }
 
-
+    /**
+     * This method will get all comments that are displayed on the right post.
+     */
     private JSONArray getAllComments() {
         String comments;
         JSONObject jsonObject;
@@ -207,7 +246,7 @@ public class CommentFragment extends ListFragment {
         if (!comments.equals("server error")) {
             try {
                 jsonObject = new JSONObject(comments);
-                jsonArray = jsonObject.getJSONArray(COMMENT_TAG);
+                jsonArray = jsonObject.getJSONArray(COMMENTS_TAG);
                 return jsonArray;
             } catch (JSONException e) {
                 return new JSONArray();
@@ -217,112 +256,54 @@ public class CommentFragment extends ListFragment {
         }
     }
 
-
+    /**
+     * This method will get the comment authors username from the database from a given user id.
+     */
     private String getCommentAuthor(String commentAuthorID) {
-        String postAuthor;
-        String postAuthorName = null;
+        String user;
+        String commentAuthorName = null;
         JSONObject jsonObject;
         JSONArray jsonArray;
         try {
-            postAuthor = new GetTask().execute(MainActivity.URL + "/get_user_by_id/" + commentAuthorID).get();
+            user = new GetTask().execute(MainActivity.URL + "/get_user_by_id/" + commentAuthorID).get();
         } catch (InterruptedException | ExecutionException e) {
-            postAuthor = "server error";
+            user = "server error";
             e.printStackTrace();
         }
 
-        if (!postAuthor.equals("server error")) {
+        if (!user.equals("server error")) {
             try {
-                jsonObject = new JSONObject(postAuthor);
+                jsonObject = new JSONObject(user);
                 jsonArray = jsonObject.getJSONArray(USER_TAG);
                 jsonObject = jsonArray.getJSONObject(0);
-                postAuthorName = jsonObject.getString(USERNAME_TAG);
+                commentAuthorName = jsonObject.getString(USERNAME_TAG);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
-        return postAuthorName;
+        return commentAuthorName;
     }
 
-    public String makePost() {
-        InputStream inputStream;
-        String result;
-        try {
-            // Create HttpClient
-            HttpClient httpclient = new DefaultHttpClient();
-
-            // Make makePost request to the given URL
-            HttpPost httpPost = new HttpPost(MainActivity.URL + "/add_comment");
-
-            String json;
-
-            // Build jsonObject
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.accumulate("post_id", mPostID);
-            jsonObject.accumulate("user_id", ActivatedUser.activatedUserID);
-            jsonObject.accumulate("comment_text", mCommentText);
-
-            // Convert JSONObject to JSON to String
-            json = jsonObject.toString();
-
-            // Set json to StringEntity
-            StringEntity se = new StringEntity(json);
-
-            // Set httpPost Entity
-            httpPost.setEntity(se);
-
-            // Execute makePost request to the given URL
-            HttpResponse httpResponse = httpclient.execute(httpPost);
-
-            // Receive response as inputStream.
-            inputStream = httpResponse.getEntity().getContent();
-
-            // Convert the inputStream to string.
-            result = convertInputStreamToString(inputStream);
-
-        } catch (Exception e) {
-            result = "server error";
-            e.printStackTrace();
-        }
-        return result;
-    }
-
-
-    private class MakeCommentTask extends AsyncTask<Void, Void, String> {
-
-        @Override
-        protected String doInBackground(Void... params) {
-            String result;
-            String dict = makePost();
-
-            try {
-                JSONObject jsonObject = new JSONObject(dict);
-                result = jsonObject.getString(RESULT_TAG);
-            } catch (JSONException e) {
-                result = "server error";
-                e.printStackTrace();
-            }
-            return result;
-        }
-    }
-
-    private String convertInputStreamToString(InputStream inputStream) throws IOException {
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-        String line;
-        String result = "";
-        while ((line = bufferedReader.readLine()) != null)
-            result += line;
-
-        inputStream.close();
-        return result;
-    }
-
-
-
+    /**
+     * This method is used when the user want to refresh a fragment.
+     * It will load the right data again and after that set a new list adapter.
+     */
     public void refreshFragment() {
-        mCommentView.setText("");
         getDataInList();
+        mCommentView.setText("");
         CommentListAdapter adapter = new CommentListAdapter(getActivity(), myList);
         setListAdapter(adapter);
+    }
+
+    /**
+     * Calling this when i want to hide the keyboard.
+     */
+    private void hideKeyboard() {
+        View view = getActivity().getCurrentFocus();
+        if (view != null) {
+            InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+            inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+        }
     }
 }
 

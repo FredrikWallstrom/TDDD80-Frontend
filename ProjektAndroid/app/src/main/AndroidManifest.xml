@@ -26,7 +26,7 @@
 
         <!-- Register activity -->
         <activity
-            android:name=".login.RegisterActivity"
+            android:name=".activity.RegisterActivity"
             android:theme="@style/NoActionBar" />
 
         <!-- Loading screen activity -->
@@ -48,7 +48,7 @@
 
         <!-- Login activity -->
         <activity
-            android:name=".login.LoginActivity"
+            android:name=".activity.LoginActivity"
             android:theme="@style/NoActionBar"
             android:windowSoftInputMode="adjustResize|stateHidden">
             <intent-filter>
