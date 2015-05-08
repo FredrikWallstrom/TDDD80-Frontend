@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.example.frewa814.livekrubb.asynctask.LikeTask;
 import com.example.frewa814.livekrubb.flow.FlowListData;
 import com.example.frewa814.livekrubb.misc.ActivatedUser;
 import com.example.frewa814.livekrubb.misc.AutoResizeTextView;
@@ -48,7 +49,6 @@ public class FlowListAdapter extends BaseAdapter {
     private static final String COMMENTS_TAG = "comments";
     private ArrayList myList = new ArrayList();
     private LayoutInflater inflater;
-    private String mActivatedPerson = ActivatedUser.activatedUsername;
     OnButtonClickedListener mListener;
     private Fragment fragment;
 
@@ -133,7 +133,7 @@ public class FlowListAdapter extends BaseAdapter {
                 try {
                     JSONObject jsonObject = likeArray.getJSONObject(e);
                     String username = jsonObject.getString(USERNAME_TAG);
-                    if (username.equals(mActivatedPerson)) {
+                    if (username.equals(ActivatedUser.activatedUsername)) {
                         unLikeFlag = true;
                     }
                 } catch (JSONException e1) {
@@ -161,7 +161,7 @@ public class FlowListAdapter extends BaseAdapter {
                 String postID = flowListData.getPostID();
 
 
-                MakeLikeTask postTask = new MakeLikeTask(postID, mActivatedPerson);
+                LikeTask postTask = new LikeTask(postID, ActivatedUser.activatedUsername);
 
                 try {
                     String result = postTask.execute((Void) null).get();
@@ -181,7 +181,6 @@ public class FlowListAdapter extends BaseAdapter {
                 updateLikeView(postID, mViewHolder);
             }
         });
-
 
         mViewHolder.recipeButton.setOnClickListener(new View.OnClickListener()
 
@@ -213,7 +212,7 @@ public class FlowListAdapter extends BaseAdapter {
                                                              FlowListData flowListData = (FlowListData) myList.get(position);
                                                              String postID = flowListData.getPostID();
 
-                                                             mListener.onCommentButtonClicked(postID, fragment);
+                                                             mListener.onButtonClicked(postID, "CommentFragment");
                                                          }
                                                      }
 
@@ -240,7 +239,7 @@ public class FlowListAdapter extends BaseAdapter {
                                                               }
 
                                                               if (userID != null) {
-                                                                  mListener.onMyPageClicked(userID);
+                                                                  mListener.onButtonClicked(userID, "MyPageFragment");
                                                               }
                                                           }
                                                       }
@@ -318,82 +317,7 @@ public class FlowListAdapter extends BaseAdapter {
         Button recipeButton, likeButton, commentButton;
     }
 
-    /**
-     * This method will make a post to the database and like or unlike one post
-     * depend if the user already like the post or not.
-     */
-    public String makePost(String postId, String liker) {
-        InputStream inputStream;
-        String result;
-        try {
-            // Create HttpClient
-            HttpClient httpclient = new DefaultHttpClient();
-            // Make makePost request to the given URL
-            HttpPost httpPost = new HttpPost(MainActivity.URL + "/like_post");
-            String json;
-            // Build jsonObject
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.accumulate("postid", postId);
-            jsonObject.accumulate("liker", liker);
-            // Convert JSONObject to JSON to String
-            json = jsonObject.toString();
-            // Set json to StringEntity
-            StringEntity se = new StringEntity(json);
-            // Set httpPost Entity
-            httpPost.setEntity(se);
-            // Execute makePost request to the given URL
-            HttpResponse httpResponse = httpclient.execute(httpPost);
-            // Receive response as inputStream.
-            inputStream = httpResponse.getEntity().getContent();
-            // Convert the inputStream to string.
-            result = convertInputStreamToString(inputStream);
-        } catch (Exception e) {
-            result = "server error";
-            e.printStackTrace();
-        }
-        return result;
-    }
 
-    /**
-     * Private task class that will be running in the background,
-     * when it is done it will return the result to the onClickListener for the like button.
-     *
-     * @result will be "liked" or "un_liked" depend on what the database has did.
-     */
-    private class MakeLikeTask extends AsyncTask<Void, Void, String> {
-        String postId;
-        String liker;
 
-        MakeLikeTask(String postId, String liker) {
-            this.postId = postId;
-            this.liker = liker;
-        }
 
-        @Override
-        protected String doInBackground(Void... params) {
-            String result;
-            String dict = makePost(postId, liker);
-
-            try {
-                JSONObject jsonObject = new JSONObject(dict);
-                result = jsonObject.getString(RESULT_TAG);
-            } catch (JSONException e) {
-                result = "server error";
-                e.printStackTrace();
-            }
-            return result;
-        }
-
-    }
-
-    private String convertInputStreamToString(InputStream inputStream) throws IOException {
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-        String line;
-        String result = "";
-        while ((line = bufferedReader.readLine()) != null)
-            result += line;
-
-        inputStream.close();
-        return result;
-    }
 }

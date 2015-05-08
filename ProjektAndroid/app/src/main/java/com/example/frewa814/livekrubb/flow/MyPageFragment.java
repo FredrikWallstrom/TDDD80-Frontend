@@ -1,13 +1,12 @@
 package com.example.frewa814.livekrubb.flow;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.ListFragment;
-import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,6 +17,7 @@ import com.example.frewa814.livekrubb.asynctask.FollowTask;
 import com.example.frewa814.livekrubb.asynctask.GetTask;
 import com.example.frewa814.livekrubb.adapters.FlowListAdapter;
 import com.example.frewa814.livekrubb.misc.ActivatedUser;
+import com.example.frewa814.livekrubb.misc.OnButtonClickedListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -44,25 +44,39 @@ public class MyPageFragment extends ListFragment {
     private static final String LOCATION_TAG = "location";
     private TextView nameView;
     private Button followButton;
+    OnButtonClickedListener mListener;
 
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
 
+        try {
+            mListener = (OnButtonClickedListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString() + " must implement OnButtonClickedListener ");
+        }
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        ActionBar actionBar = getActivity().getActionBar();
+        if (actionBar != null) {
+            actionBar.show();
+        }
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.my_page, container, false);
 
         nameView = (TextView) rootView.findViewById(R.id.name_my_page);
         followButton = (Button) rootView.findViewById(R.id.follow_button);
+        Button personalToplist = (Button) rootView.findViewById(R.id.personal_toplist_button);
+        personalToplist.setOnClickListener(clickListener);
         followButton.setOnClickListener(clickListener);
 
-        mUserID = getArguments().getString("user_id");
+        mUserID = getArguments().getString("id");
 
         setInformationAboutUser();
 
@@ -75,7 +89,7 @@ public class MyPageFragment extends ListFragment {
 
         boolean following = checkIfFollow();
 
-        if (following){
+        if (following) {
             followButton.setText("Unfollow");
         }
 
@@ -91,7 +105,7 @@ public class MyPageFragment extends ListFragment {
         String users;
         JSONObject jsonObject;
         JSONArray jsonArray;
-        if (!mUserID.equals(ActivatedUser.activatedUserID)){
+        if (!mUserID.equals(ActivatedUser.activatedUserID)) {
             try {
                 users = new GetTask().execute(MainActivity.URL + "/get_followers_by_id/" + mUserID).get();
             } catch (InterruptedException | ExecutionException e) {
@@ -106,7 +120,7 @@ public class MyPageFragment extends ListFragment {
                     for (int i = 0; i < jsonArray.length(); i++) {
                         jsonObject = jsonArray.getJSONObject(i);
                         String userID = jsonObject.getString(ID_TAG);
-                        if (userID.equals(ActivatedUser.activatedUserID)){
+                        if (userID.equals(ActivatedUser.activatedUserID)) {
                             return true;
                         }
                     }
@@ -149,7 +163,6 @@ public class MyPageFragment extends ListFragment {
     }
 
 
-
     private void getDataInList() {
         List<String> recipeNameList = new ArrayList<>();
         List<String> postInformationList = new ArrayList<>();
@@ -161,7 +174,6 @@ public class MyPageFragment extends ListFragment {
         List<JSONObject> recipeList = new ArrayList<>();
 
 
-
         try {
             posts = PublicFlowFragment.posts;
             if (posts != null) {
@@ -169,7 +181,7 @@ public class MyPageFragment extends ListFragment {
                     for (int i = 0; i < posts.length(); i++) {
                         JSONObject object = posts.getJSONObject(i);
 
-                        if (object.getString(USER_ID_TAG).equals(mUserID)){
+                        if (object.getString(USER_ID_TAG).equals(mUserID)) {
                             String recipeName = object.getString(RECIPE_NAME_TAG);
                             String postInformation = object.getString(POST_INFORMATION_TAG);
                             String postID = object.getString(ID_TAG);
@@ -245,31 +257,26 @@ public class MyPageFragment extends ListFragment {
     View.OnClickListener clickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            FollowTask followTask = new FollowTask(ActivatedUser.activatedUserID, mUserID);
-            try {
-                String result = followTask.execute((Void) null).get();
-                System.out.println(result);
-                if (result.equals("un_followed")) {
-                    followButton.setText("Follow");
+            if (view.getId() == R.id.personal_toplist_button) {
+                mListener.onButtonClicked(mUserID, "PersonalToplistFragment");
+            } else {
+                FollowTask followTask = new FollowTask(ActivatedUser.activatedUserID, mUserID);
+                try {
+                    String result = followTask.execute((Void) null).get();
+                    System.out.println(result);
+                    if (result.equals("un_followed")) {
+                        followButton.setText("Follow");
+                    } else {
+                        followButton.setText("Unfollow");
+                    }
+                } catch (InterruptedException | ExecutionException e) {
+                    e.printStackTrace();
                 }
-                else{
-                    followButton.setText("Unfollow");
-                }
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
             }
         }
     };
 
-    private void hideKeyboard() {
-        View view = getActivity().getCurrentFocus();
-        if (view != null) {
-            InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-            inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-        }
-    }
-
-    public void refresh(){
+    public void refresh() {
         getDataInList();
         FlowListAdapter adapter = new FlowListAdapter(getActivity(), myList, this);
         setListAdapter(adapter);

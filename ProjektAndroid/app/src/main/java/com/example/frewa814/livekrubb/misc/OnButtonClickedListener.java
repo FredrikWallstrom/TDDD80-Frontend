@@ -1,6 +1,5 @@
 package com.example.frewa814.livekrubb.misc;
 
-import android.app.Fragment;
 import android.view.View;
 
 import org.json.JSONObject;
@@ -13,6 +12,5 @@ public interface OnButtonClickedListener {
     public void onButtonClicked(View view);
     public void onTaskDone();
     public void onShowRecipeButtonClicked(JSONObject recipe);
-    public void onCommentButtonClicked(String postId, Fragment currentFragment);
-    public void onMyPageClicked(String user_id);
+    public void onButtonClicked(String id, String nextFragment);
 }

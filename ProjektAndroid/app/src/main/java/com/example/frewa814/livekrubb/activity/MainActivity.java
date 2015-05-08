@@ -27,6 +27,7 @@ import com.example.frewa814.livekrubb.comment.CommentFragment;
 import com.example.frewa814.livekrubb.flow.FollowersFlowListFragment;
 import com.example.frewa814.livekrubb.flow.PublicFlowFragment;
 import com.example.frewa814.livekrubb.misc.ActivatedUser;
+import com.example.frewa814.livekrubb.recipe.PersonalToplistFragment;
 import com.example.frewa814.livekrubb.recipe.ShareRecipeFragment;
 import com.example.frewa814.livekrubb.recipe.ShowRecipeFragment;
 import com.example.frewa814.livekrubb.flow.MyPageFragment;
@@ -123,7 +124,7 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
                         e.printStackTrace();
                     }
                     if (user_id != null) {
-                        onMyPageClicked(user_id);
+                        onButtonClicked(user_id, "MyPageFragment");
                         return true;
                     }
 
@@ -165,7 +166,7 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
 
             // Case My page button.
             case R.id.action_my_page:
-                onMyPageClicked(ActivatedUser.activatedUserID);
+                onButtonClicked(ActivatedUser.activatedUserID, "MyPageFragment");
                 break;
 
             // Case Recipe bank button.
@@ -281,23 +282,21 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
                     hideKeyboard();
                     mSearchMenuItem.collapseActionView();
 
-                    if (allUsers != null){
+                    if (allUsers != null) {
                         try {
                             JSONObject jsonObject = allUsers.getJSONObject(position);
                             user_id = jsonObject.getString(ID_TAG);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-                        if (user_id != null){
-                            onMyPageClicked(user_id);
+                        if (user_id != null) {
+                            onButtonClicked(user_id, "MyPageFragment");
                             return true;
                         }
                     }
                     return false;
                 }
             });
-
-
         }
     }
 
@@ -369,7 +368,6 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
         }
     }
 
-
     @Override
     public void onTaskDone() {
         // Show the actionbar.
@@ -403,45 +401,39 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
     }
 
     @Override
-    public void onCommentButtonClicked(String postId, Fragment currentFragment) {
+    public void onButtonClicked(String id, String nextFragment) {
         FragmentManager fm = getFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
 
         Bundle bundle = new Bundle();
-        bundle.putString("post_id", postId);
+        bundle.putString("id", id);
 
-        CommentFragment commentFragment = new CommentFragment();
-        ft.replace(R.id.fragment_container, commentFragment);
-        commentFragment.setArguments(bundle);
-
-        if (!(currentFragment instanceof CommentFragment)) {
-            ft.addToBackStack(null);
+        switch (nextFragment) {
+            case "PersonalToplistFragment":
+                PersonalToplistFragment personalToplist = new PersonalToplistFragment();
+                ft.replace(R.id.fragment_container, personalToplist);
+                personalToplist.setArguments(bundle);
+                ft.addToBackStack(null);
+                ft.commit();
+                break;
+            case "CommentFragment":
+                CommentFragment commentFragment = new CommentFragment();
+                ft.replace(R.id.fragment_container, commentFragment);
+                commentFragment.setArguments(bundle);
+                ft.addToBackStack(null);
+                ft.commit();
+                break;
+            case "MyPageFragment":
+                MyPageFragment myPageFragment = new MyPageFragment();
+                ft.replace(R.id.fragment_container, myPageFragment);
+                myPageFragment.setArguments(bundle);
+                ft.commit();
+                break;
         }
-        ft.commit();
-    }
-
-    @Override
-    public void onMyPageClicked(String user_id) {
-        hideKeyboard();
-        FragmentManager fm = getFragmentManager();
-        FragmentTransaction ft = fm.beginTransaction();
-
-        Bundle bundle = new Bundle();
-        bundle.putString("user_id", user_id);
-
-        MyPageFragment myPageFragment = new MyPageFragment();
-        ft.replace(R.id.fragment_container, myPageFragment);
-        myPageFragment.setArguments(bundle);
-        ft.commit();
-
     }
 
     @Override
     public void onBackPressed() {
-        ActionBar actionBar = this.getActionBar();
-        if (actionBar != null) {
-            actionBar.show();
-        }
         super.onBackPressed();
     }
 }

@@ -1,5 +1,6 @@
 package com.example.frewa814.livekrubb.flow;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.ListFragment;
 import android.content.Context;
@@ -48,6 +49,8 @@ public class FollowersFlowListFragment extends ListFragment {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
+
+
         try {
             mListener = (OnButtonClickedListener) activity;
         } catch (ClassCastException e) {
@@ -58,6 +61,11 @@ public class FollowersFlowListFragment extends ListFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        ActionBar actionBar = getActivity().getActionBar();
+        if (actionBar != null) {
+            actionBar.show();
+        }
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.followers_flow_list, container, false);
 

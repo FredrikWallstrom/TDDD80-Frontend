@@ -42,9 +42,9 @@
 
     <Button
         android:id="@+id/comment_button"
-        style="?android:attr/buttonStyleSmall"
         android:layout_width="100dp"
         android:layout_height="25dp"
+        style="?android:attr/buttonStyleSmall"
         android:background="@drawable/custom_buttons"
         android:text="Comment"
         android:layout_alignParentBottom="true"

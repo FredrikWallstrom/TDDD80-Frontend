@@ -168,7 +168,7 @@ public class CommentFragment extends ListFragment {
 
         // Get the post id from the bundle so we know which commentPage
         // we gonna display.
-        mPostID = getArguments().getString("post_id");
+        mPostID = getArguments().getString("id");
 
         // Get all posts in the database that's gonna represent the flow.
         getDataInList();
@@ -186,10 +186,14 @@ public class CommentFragment extends ListFragment {
      * be sent to the CommentListAdapter.
      */
     private void getDataInList() {
+        JSONArray comments;
+
+        // Temp lists there we will save the comment text and the commentAuthor.
         List<String> commentAuthorList = new ArrayList<>();
         List<String> commentTextList = new ArrayList<>();
+
+        // The list that will be sent to the commentListAdapter.
         myList = new ArrayList<>();
-        JSONArray comments;
 
         try {
             comments = getAllComments();

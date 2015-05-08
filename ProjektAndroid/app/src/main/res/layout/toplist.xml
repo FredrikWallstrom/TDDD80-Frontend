@@ -7,18 +7,23 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:layout_alignParentBottom="true"
         android:id="@+id/linearLayout2">
 
         <Button
             android:id="@+id/recipe_bank_button"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
+            style="?android:attr/buttonStyleSmall"
+            android:background="@drawable/custom_buttons"
             android:layout_weight="1"
             android:text="Bank" />
 
         <Button
             android:id="@+id/toplist_button"
             android:layout_width="fill_parent"
+            style="?android:attr/buttonStyleSmall"
+            android:background="@drawable/custom_buttons"
             android:layout_height="fill_parent"
             android:layout_weight="1"
             android:text="Toplist" />
@@ -29,7 +34,7 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:id="@android:id/list"
-        android:layout_alignEnd="@+id/toplist_button"
-        android:layout_below="@+id/linearLayout2" />
+        android:layout_alignParentTop="true"
+        android:layout_above="@+id/linearLayout2" />
 
 </RelativeLayout>

@@ -1,5 +1,6 @@
 package com.example.frewa814.livekrubb.recipe;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.ListFragment;
 import android.content.Context;
@@ -42,6 +43,7 @@ public class RecipeBankFragment extends ListFragment implements AdapterView.OnIt
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
+
         try {
             mListener = (OnButtonClickedListener) activity;
         } catch (ClassCastException e) {
@@ -52,16 +54,21 @@ public class RecipeBankFragment extends ListFragment implements AdapterView.OnIt
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        ActionBar actionBar = getActivity().getActionBar();
+        if (actionBar != null) {
+            actionBar.show();
+        }
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.recipe_bank, container, false);
 
         // Set button listener for the recipe bank button and toplist button.
         Button recipeBankButton = (Button) rootView.findViewById(R.id.recipe_bank_button);
         Button toplistButton = (Button) rootView.findViewById(R.id.toplist_button);
-        final SearchView searchButton = (SearchView) rootView.findViewById(R.id.searchView_recipe_bank);
         recipeBankButton.setOnClickListener(clickListener);
         toplistButton.setOnClickListener(clickListener);
 
+        final SearchView searchButton = (SearchView) rootView.findViewById(R.id.searchView_recipe_bank);
         searchButton.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 
             @Override
@@ -161,7 +168,6 @@ public class RecipeBankFragment extends ListFragment implements AdapterView.OnIt
     View.OnClickListener clickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-
             mListener.onButtonClicked(view);
         }
     };

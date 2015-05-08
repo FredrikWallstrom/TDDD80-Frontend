@@ -45,7 +45,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="fill_parent"
                     android:text="Create Recipe"
-                    style="@style/text_view_share_recipe"
+                    style="@style/text_views"
                     android:id="@+id/textView5" />
 
 

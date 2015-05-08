@@ -8,12 +8,15 @@
         android:id="@+id/linearLayout3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
         android:orientation="horizontal">
 
         <Button
             android:id="@+id/recipe_bank_button"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
+            style="?android:attr/buttonStyleSmall"
+            android:background="@drawable/custom_buttons"
             android:layout_weight="1"
             android:text="Bank" />
 
@@ -21,32 +24,29 @@
             android:id="@+id/toplist_button"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
+            style="?android:attr/buttonStyleSmall"
+            android:background="@drawable/custom_buttons"
             android:layout_weight="1"
             android:text="Toplist" />
 
     </LinearLayout>
 
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_alignParentBottom="true"
-        android:id="@+id/linearLayout4">
-
-        <SearchView
-            android:layout_width="wrap_content"
-            android:background="@android:drawable/button_onoff_indicator_on"
-            android:queryHint="Search recipe"
-            android:layout_height="wrap_content"
-            android:id="@+id/searchView_recipe_bank" />
-    </LinearLayout>
-
     <ListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@android:id/list"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_above="@+id/searchView_recipe_bank" />
+
+    <SearchView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@android:id/list"
-        android:layout_above="@+id/linearLayout4"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@+id/linearLayout3" />
+        android:background="@android:drawable/button_onoff_indicator_on"
+        android:queryHint="Search recipe"
+        android:id="@+id/searchView_recipe_bank"
+        android:layout_above="@+id/linearLayout3"
+        android:layout_alignParentStart="true" />
 
 </RelativeLayout>

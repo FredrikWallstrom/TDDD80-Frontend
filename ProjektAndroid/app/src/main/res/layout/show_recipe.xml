@@ -7,10 +7,10 @@
         android:id="@+id/share_recipe_form"
         android:layout_width="match_parent"
         android:layout_height="fill_parent"
-        android:fillViewport="false"
+        android:layout_alignParentBottom="true"
         android:layout_alignParentTop="true"
         android:layout_toEndOf="@+id/share_progress"
-        android:layout_alignParentBottom="true">
+        android:fillViewport="false">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -32,10 +32,10 @@
                     android:src="@drawable/ic_backbutton" />
 
                 <TextView
+                    android:id="@+id/recipe_name_show_recipe"
+                    style="@style/text_views"
                     android:layout_width="match_parent"
-                    android:layout_height="fill_parent"
-                    style="@style/text_view_share_recipe"
-                    android:id="@+id/recipe_name_show_recipe" />
+                    android:layout_height="fill_parent" />
 
 
             </LinearLayout>
@@ -44,9 +44,9 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_weight="7.79"
                 android:orientation="vertical"
-                android:weightSum="1"
-                android:layout_weight="7.79">
+                android:weightSum="1">
 
                 <View
                     android:layout_width="fill_parent"
@@ -56,18 +56,107 @@
                 <ScrollView
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    android:fillViewport="true"
-                    android:layout_marginTop="20dp">
+                    android:layout_marginTop="20dp"
+                    android:fillViewport="true">
 
                     <TextView
+                        android:id="@+id/recipe_directions_show_recipe"
                         android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/recipe_directions_show_recipe" />
+                        android:layout_height="wrap_content" />
 
                 </ScrollView>
 
             </LinearLayout>
         </LinearLayout>
     </ScrollView>
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="false"
+        android:layout_alignParentStart="false"
+        android:layout_gravity="bottom"
+        android:gravity="bottom"
+        android:orientation="vertical"
+        android:weightSum="66">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:id="@+id/linearLayout4">
+
+            <TextView
+                android:id="@+id/comment_view_show_recipe"
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:text="Comments"
+                android:layout_marginLeft="20dp" />
+
+            <TextView
+                android:id="@+id/like_view_show_recipe"
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:text="likes" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:id="@+id/linearLayout3">
+
+            <Button
+                android:id="@+id/comment_button_show_recipe"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                style="?android:attr/buttonStyleSmall"
+                android:background="@drawable/custom_buttons"
+                android:layout_weight="1"
+                android:text="Comment" />
+
+            <Button
+                android:id="@+id/like_button_show_recipe"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                style="?android:attr/buttonStyleSmall"
+                android:background="@drawable/custom_buttons"
+                android:layout_weight="1"
+                android:text="Like" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/linearLayout2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="bottom"
+            android:orientation="horizontal"
+            android:weightSum="66">
+
+
+            <TextView
+                android:id="@+id/textView3"
+                style="@style/text_views"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:gravity="start|center"
+                android:text="Posted by:" />
+
+            <TextView
+                android:id="@+id/posted_by_name_view"
+                style="@style/text_views"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:gravity="start|center"
+                android:text="Name" />
+
+        </LinearLayout>
+    </LinearLayout>
 
 </RelativeLayout>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/linearLayout"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:orientation="vertical"
+        android:weightSum="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="1">
+
+            <ImageView
+                android:id="@+id/back_button"
+                android:layout_width="50dp"
+                android:layout_height="60dp"
+                android:contentDescription="TODO"
+                android:src="@drawable/ic_backbutton" />
+
+            <TextView
+                android:id="@+id/recipe_name_show_recipe"
+                style="@style/text_views"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginTop="20dp"
+                android:gravity="left|center"
+                android:text="Toplist for:" />
+
+            <TextView
+                android:id="@+id/personal_toplist_name_view"
+                style="@style/text_views"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="left|center"
+                android:text="Name" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:weightSum="1">
+
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="1dp"
+                android:background="@android:color/black" />
+
+            <ListView
+                android:id="@android:id/list"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="12.60"
+                android:scrollbars="none" />
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+</LinearLayout>

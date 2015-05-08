@@ -28,7 +28,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="fill_parent"
-                style="@style/text_view_share_recipe"
+                style="@style/text_views"
                 android:text="Comments"
                 android:id="@+id/recipe_name_show_recipe" />
 

@@ -6,6 +6,10 @@
                 android:startColor="#9aaf55a4"
                 android:endColor="#9aaf55a4"
                 android:angle="270" />
+            <stroke
+                android:width="2dp"
+                android:color="#933a3a3a" />
         </shape>
+
     </item>
 </selector>
