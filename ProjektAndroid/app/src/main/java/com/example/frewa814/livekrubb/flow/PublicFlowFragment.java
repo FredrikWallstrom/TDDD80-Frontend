@@ -33,7 +33,7 @@ import java.util.concurrent.ExecutionException;
  */
 public class PublicFlowFragment extends ListFragment {
 
-    private static final String POST_TAG = "posts";
+
     private static final String RECIPE_NAME_TAG = "recipe_name";
     private static final String POST_INFORMATION_TAG = "post_information";
     private static final String POST_AUTHOR_ID_TAG = "user_id";
@@ -42,7 +42,7 @@ public class PublicFlowFragment extends ListFragment {
     private static final String ID_TAG = "id";
     private static final String LOCATION_TAG = "location";
 
-    public static JSONArray posts;
+
     private ArrayList myList;
     OnButtonClickedListener mListener;
 
@@ -95,9 +95,11 @@ public class PublicFlowFragment extends ListFragment {
         List<String> locationList = new ArrayList<>();
 
         myList = new ArrayList();
+        JSONArray posts;
+
+        posts = MainActivity.allPosts;
 
         try {
-            posts = getAllPosts();
             if (posts != null) {
                 if (posts.length() != 0) {
                     posts = getPostsSorted(posts);
@@ -185,35 +187,6 @@ public class PublicFlowFragment extends ListFragment {
         return new JSONArray(jsonValues);
     }
 
-
-
-    /**
-     * Get all posts from the database.
-     */
-    private JSONArray getAllPosts() {
-        String result;
-        JSONObject jsonObject;
-        JSONArray jsonArray;
-        try {
-            result = new GetTask().execute(MainActivity.URL + "/all_posts").get();
-        } catch (InterruptedException | ExecutionException e) {
-            result = "server error";
-            e.printStackTrace();
-        }
-
-        if (!result.equals("server error")) {
-            try {
-                jsonObject = new JSONObject(result);
-                jsonArray = jsonObject.getJSONArray(POST_TAG);
-                return jsonArray;
-            } catch (JSONException e) {
-                return new JSONArray();
-            }
-        } else {
-            return null;
-        }
-
-    }
 
     // When a button is clicked, notify the activity.
     // MainActivity will then create the new fragment.

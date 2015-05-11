@@ -175,7 +175,7 @@ public class MyPageFragment extends ListFragment {
 
 
         try {
-            posts = PublicFlowFragment.posts;
+            posts = MainActivity.allPosts;
             if (posts != null) {
                 if (posts.length() != 0) {
                     for (int i = 0; i < posts.length(); i++) {

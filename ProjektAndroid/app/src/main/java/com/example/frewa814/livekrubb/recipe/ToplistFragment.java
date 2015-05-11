@@ -101,7 +101,7 @@ public class TopListFragment extends ListFragment implements AdapterView.OnItemC
         JSONArray jsonArray;
         String likes;
 
-        recipes = PublicFlowFragment.posts;
+        recipes = MainActivity.allPosts;
 
         if (recipes != null) {
             try {

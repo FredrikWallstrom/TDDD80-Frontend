@@ -86,6 +86,8 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            style="?android:attr/buttonStyleSmall"
+            android:background="@drawable/custom_buttons"
             android:text="Add"
             android:id="@+id/comment"
             android:layout_gravity="bottom" />

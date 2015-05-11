@@ -45,15 +45,18 @@
 
                 <Button
                     android:id="@+id/personal_toplist_button"
-                    android:layout_width="wrap_content"
+                    android:layout_width="130dp"
+                    style="?android:attr/buttonStyleSmall"
+                    android:background="@drawable/custom_buttons"
                     android:layout_height="match_parent"
-                    android:layout_gravity="right"
                     android:text="Top 5 recipes." />
 
                 <Button
                     android:id="@+id/follow_button"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    style="?android:attr/buttonStyleSmall"
+                    android:background="@drawable/custom_buttons"
+                    android:layout_height="match_parent"
                     android:text="Follow" />
 
             </LinearLayout>

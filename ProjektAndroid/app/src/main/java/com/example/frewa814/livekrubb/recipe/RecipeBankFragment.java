@@ -90,7 +90,7 @@ public class RecipeBankFragment extends ListFragment implements AdapterView.OnIt
     }
 
     private void submitSearch(String query) {
-        JSONArray jsonArray = PublicFlowFragment.posts;
+        JSONArray jsonArray = MainActivity.allPosts;
         recipeList = new ArrayList<>();
         recipeIDList = new ArrayList<>();
         for (int i = 0; i < jsonArray.length(); i++) {
@@ -141,7 +141,7 @@ public class RecipeBankFragment extends ListFragment implements AdapterView.OnIt
     }
 
     private void updateListView(String newText) {
-        JSONArray jsonArray = PublicFlowFragment.posts;
+        JSONArray jsonArray = MainActivity.allPosts;
         recipeList = new ArrayList<>();
         recipeIDList = new ArrayList<>();
         for (int i = 0; i < jsonArray.length(); i++) {
@@ -188,7 +188,7 @@ public class RecipeBankFragment extends ListFragment implements AdapterView.OnIt
         recipeList = new ArrayList<>();
         recipeIDList = new ArrayList<>();
             try {
-                JSONArray jsonArray = PublicFlowFragment.posts;
+                JSONArray jsonArray = MainActivity.allPosts;
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject jsonObject = jsonArray.getJSONObject(i);
                     String recipe_name = jsonObject.getString(RECIPE_NAME_TAG);

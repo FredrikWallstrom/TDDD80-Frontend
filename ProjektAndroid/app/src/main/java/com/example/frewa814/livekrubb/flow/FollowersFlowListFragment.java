@@ -104,7 +104,7 @@ public class FollowersFlowListFragment extends ListFragment {
 
 
 
-        posts = PublicFlowFragment.posts;
+        posts = MainActivity.allPosts;
         if (posts != null) {
             if (posts.length() != 0) {
 

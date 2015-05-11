@@ -111,7 +111,7 @@ public class PersonalToplistFragment extends ListFragment implements AdapterView
         String likes;
 
         // All posts
-        recipes = PublicFlowFragment.posts;
+        recipes = MainActivity.allPosts;
 
 
         if (recipes != null) {
