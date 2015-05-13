@@ -18,13 +18,25 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 /**
- * Created by Fredrik on 2015-05-04.
+ * A class that is used when we want to do add one follower or unFollower to tha database.
  */
 public class FollowTask extends AsyncTask<Void, Void, String> {
+
+    /**
+     * Constant tags for http requests.
+     */
     private static final String RESULT_TAG = "result";
+
+    /**
+     * This fields will represent user_id´s on the one who want to follow
+     * and on the one who is being followed.
+     */
     private String followerID;
     private String followedID;
 
+    /**
+     * Constructor for this class that will init the followedID and followerID
+     */
     public FollowTask(String followerID, String followedID) {
         this.followedID = followedID;
         this.followerID = followerID;
@@ -46,20 +58,9 @@ public class FollowTask extends AsyncTask<Void, Void, String> {
     }
 
 
-    private String convertInputStreamToString(InputStream inputStream) throws IOException {
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-        String line;
-        String result = "";
-        while ((line = bufferedReader.readLine()) != null)
-            result += line;
-
-        inputStream.close();
-        return result;
-    }
-
     /**
-     * This method will make a post to the database and like or unlike one post
-     * depend if the user already like the post or not.
+     * This method will make a post to the database and follow or unFollow one user
+     * depend if the user already follows the user or not.
      */
     public String makePost() {
         InputStream inputStream;
@@ -92,4 +93,19 @@ public class FollowTask extends AsyncTask<Void, Void, String> {
         }
         return result;
     }
+
+    /**
+     * Convert the inputStream to a readable string.
+     */
+    private String convertInputStreamToString(InputStream inputStream) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+        String line;
+        String result = "";
+        while ((line = bufferedReader.readLine()) != null)
+            result += line;
+
+        inputStream.close();
+        return result;
+    }
 }
+

@@ -16,24 +16,28 @@ import com.example.frewa814.livekrubb.misc.OnButtonClickedListener;
 import java.util.ArrayList;
 
 /**
- * Created by Fredrik on 2015-05-01.
+ * Adapter for the list view in the comment fragment.
  */
 public class CommentListAdapter extends BaseAdapter {
-    private static final String RESULT_TAG = "result";
-    private static final String LIKES_TAG = "likes";
-    private static final String USERNAME_TAG = "username";
+
+    /**
+     * This is the list that will be presented in the list view.
+     */
     private ArrayList myList = new ArrayList();
+
+    /**
+     * Inflater.
+     */
     private LayoutInflater inflater;
-    private String mActivatedPerson = ActivatedUser.activatedUsername;
-    OnButtonClickedListener mListener;
 
 
+    /**
+     * Constructor for the class that will init the list and the inflater.
+     */
     public CommentListAdapter(Context cont, ArrayList myList) {
         this.myList = myList;
-        Context context = cont;
-        inflater = LayoutInflater.from(context);
+        inflater = LayoutInflater.from(cont);
     }
-
 
     @Override
     public int getCount() {
@@ -50,10 +54,15 @@ public class CommentListAdapter extends BaseAdapter {
         return 0;
     }
 
+    /**
+     * This method is loaded every time the user "scroll/load" in one new list item.
+     * This will set the right things on the right posts from the myList list.
+     */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         final MyViewHolder mViewHolder;
 
+        // If we are here for the first time we need to find the views in list items.
         if (convertView == null) {
             convertView = inflater.inflate(R.layout.comment_list_item, parent, false);
             mViewHolder = new MyViewHolder();
@@ -65,6 +74,7 @@ public class CommentListAdapter extends BaseAdapter {
             // Store the holder with the view.
             convertView.setTag(mViewHolder);
         } else {
+            // Get the viewHolder if we already created one before.
             mViewHolder = (MyViewHolder) convertView.getTag();
         }
 
@@ -80,6 +90,10 @@ public class CommentListAdapter extends BaseAdapter {
     }
 
 
+    /**
+     * ViewHolder so we don't need to load the views every time
+     * getView method is called.
+     */
     private static class MyViewHolder {
         TextView commentAuthorView, commentTextView;
     }

@@ -18,46 +18,45 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 /**
- * Private task class that will be running in the background,
- * when it is done it will return the result to the onClickListener for the like button.
+ * A class that is used when we want to like or unlike one post.
+ * When it is done it will return the result to the ClickListener for the like button.
  *
  * @result will be "liked" or "un_liked" depend on what the database has did.
  */
 public class LikeTask extends AsyncTask<Void, Void, String> {
+
+    /**
+     * Constant tags for http requests.
+     */
     private static final String RESULT_TAG = "result";
-    String postId;
-        String liker;
 
-        public LikeTask(String postId, String liker) {
-            this.postId = postId;
-            this.liker = liker;
+    /**
+     * This fields will represent the liker and id on the post.
+     */
+    private String postId;
+    private String liker;
+
+    /**
+     * Constructor for this class that will init the one who want to like/unlike
+     * and the post that is going to be unLiked or liked.
+     */
+    public LikeTask(String postId, String liker) {
+        this.postId = postId;
+        this.liker = liker;
+    }
+
+    @Override
+    protected String doInBackground(Void... params) {
+        String result;
+        String dict = makePost(postId, liker);
+
+        try {
+            JSONObject jsonObject = new JSONObject(dict);
+            result = jsonObject.getString(RESULT_TAG);
+        } catch (JSONException e) {
+            result = "server error";
+            e.printStackTrace();
         }
-
-        @Override
-        protected String doInBackground(Void... params) {
-            String result;
-            String dict = makePost(postId, liker);
-
-            try {
-                JSONObject jsonObject = new JSONObject(dict);
-                result = jsonObject.getString(RESULT_TAG);
-            } catch (JSONException e) {
-                result = "server error";
-                e.printStackTrace();
-            }
-            return result;
-        }
-
-
-
-    private String convertInputStreamToString(InputStream inputStream) throws IOException {
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-        String line;
-        String result = "";
-        while ((line = bufferedReader.readLine()) != null)
-            result += line;
-
-        inputStream.close();
         return result;
     }
 
@@ -94,6 +93,20 @@ public class LikeTask extends AsyncTask<Void, Void, String> {
             result = "server error";
             e.printStackTrace();
         }
+        return result;
+    }
+
+    /**
+     * Convert the inputStream to a readable string.
+     */
+    private String convertInputStreamToString(InputStream inputStream) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+        String line;
+        String result = "";
+        while ((line = bufferedReader.readLine()) != null)
+            result += line;
+
+        inputStream.close();
         return result;
     }
 }

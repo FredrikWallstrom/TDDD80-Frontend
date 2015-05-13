@@ -15,20 +15,36 @@ import java.util.List;
  */
 public class SearchUserAdapter extends CursorAdapter {
 
-    private List<String> items;
+    /**
+     * TextView there we gonna represent the names in the cursor.
+     */
     private TextView text;
 
-    public SearchUserAdapter(Context context, Cursor cursor, List<String> items) {
+    /**
+     * This is the list that will be presented in the cursor list.
+     */
+    private List<String> items;
+
+    /**
+     * Constructor for the class that will init items that gonna represent the list in the cursor.
+     */
+    SearchUserAdapter(Context context, Cursor cursor, List<String> items) {
         super(context, cursor, false);
         this.items = items;
     }
 
+    /**
+     * This method will set the text in the cursor.
+     */
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         text.setText(items.get(cursor.getPosition()));
 
     }
 
+    /**
+     * This method will inflate the xml and find the textView.
+     */
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);

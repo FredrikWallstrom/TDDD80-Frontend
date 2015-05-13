@@ -97,7 +97,7 @@ public class MyPageFragment extends ListFragment {
         getDataInList();
 
         // Make custom adapter and set it to the listview.
-        FlowListAdapter adapter = new FlowListAdapter(getActivity(), myList, this);
+        FlowListAdapter adapter = new FlowListAdapter(getActivity(), myList);
         setListAdapter(adapter);
     }
 
@@ -278,7 +278,7 @@ public class MyPageFragment extends ListFragment {
 
     public void refresh() {
         getDataInList();
-        FlowListAdapter adapter = new FlowListAdapter(getActivity(), myList, this);
+        FlowListAdapter adapter = new FlowListAdapter(getActivity(), myList);
         setListAdapter(adapter);
     }
 }

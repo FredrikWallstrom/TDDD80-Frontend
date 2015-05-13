@@ -4,7 +4,6 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.app.ListFragment;
 import android.content.Context;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,46 +19,50 @@ import com.example.frewa814.livekrubb.activity.MainActivity;
 import com.example.frewa814.livekrubb.adapters.CommentListAdapter;
 import com.example.frewa814.livekrubb.asynctask.CommentTask;
 import com.example.frewa814.livekrubb.asynctask.GetTask;
-import com.example.frewa814.livekrubb.misc.ActivatedUser;
 import com.example.frewa814.livekrubb.misc.OnButtonClickedListener;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 /**
- * Created by Fredrik on 2015-05-01.
+ * Fragment class that is gonna display the comment side in the application.
  */
 public class CommentFragment extends ListFragment {
 
+    /**
+     * Constant tags for http requests.
+     */
     private static final String USER_TAG = "user";
     private static final String USERNAME_TAG = "username";
-    OnButtonClickedListener mListener;
-
     private static final String COMMENTS_TAG = "comments";
     private static final String USER_ID_TAG = "user_id";
     private static final String COMMENT_TEXT_TAG = "comment_text";
 
-    private EditText mCommentView;
+    /**
+     * Click listener instance that will point on MainActivity
+     * so the MainActivity can handle the clicks in the fragments.
+     */
+    OnButtonClickedListener mListener;
+
+    /**
+     * This is the list that will be presented in the list view.
+     */
     private ArrayList<CommentListData> myList;
 
-    private String mCommentText;
+    /**
+     * This field is representing which post we are on.
+     */
     private String mPostID;
 
-    private CommentListAdapter adapter;
+    /**
+     * This view is the view where the user can add a comment if he wants.
+     */
+    private EditText mCommentView;
 
     @Override
     public void onAttach(Activity activity) {
@@ -104,7 +107,6 @@ public class CommentFragment extends ListFragment {
     View.OnClickListener clickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            // Result string from the AsyncTask.
             String result;
 
             // Hide the keyboard so the user can see the whole display.
@@ -113,11 +115,11 @@ public class CommentFragment extends ListFragment {
             // Reset errors.
             mCommentView.setError(null);
 
-            // Check if the clicked button was tha add comment button.
+            // Check if the clicked button was the add comment button.
             if (view.getId() == R.id.comment) {
 
                 // Get the comment text that the user entered.
-                mCommentText = mCommentView.getText().toString();
+                String mCommentText = mCommentView.getText().toString();
 
                 // Check if the user entered a valid comment.
                 if (commentTextIsValid(mCommentText)){
@@ -131,6 +133,7 @@ public class CommentFragment extends ListFragment {
                     }
                     // Check if everything went OK in the AsyncTask.
                     if (!result.equals("server error")) {
+                        // Refresh the fragment so the user can see the comment he just added.
                         refreshFragment();
                     }
                 }
@@ -146,7 +149,6 @@ public class CommentFragment extends ListFragment {
             else {
                 mListener.onButtonClicked(view);
             }
-
         }
     };
 
@@ -174,13 +176,13 @@ public class CommentFragment extends ListFragment {
         getDataInList();
 
         // Make custom adapter and set it to the listView.
-        adapter = new CommentListAdapter(getActivity(), myList);
+        CommentListAdapter adapter = new CommentListAdapter(getActivity(), myList);
         setListAdapter(adapter);
     }
 
     /**
      * This method will get all data that is gonna represent the flow.
-     * It will add the data to temp lists and then create one CommentListData
+     * It will add the data to a temp lists and then create one CommentListData
      * object for every items in the temp list.
      * And after that it will add the object to the list that will
      * be sent to the CommentListAdapter.
@@ -200,17 +202,18 @@ public class CommentFragment extends ListFragment {
             if (comments != null) {
                 for (int i = 0; i < comments.length(); i++) {
                     JSONObject object = comments.getJSONObject(i);
-
                     String commentAuthorID = object.getString(USER_ID_TAG);
                     String commentText = object.getString(COMMENT_TEXT_TAG);
 
+                    // Get the username on the commentAuthor.
                     String commentAuthor = getCommentAuthor(commentAuthorID);
 
+                    // Add the username and the commentText to the temp lists.
                     commentAuthorList.add(commentAuthor);
                     commentTextList.add(commentText);
                 }
             }
-            // If there is problem with the server.
+            // If there is problem with the server, make a toast to inform the user.
             else {
                 Toast serverError = Toast.makeText(getActivity(), "Failed to update, Try again!", Toast.LENGTH_LONG);
                 serverError.show();
@@ -227,7 +230,7 @@ public class CommentFragment extends ListFragment {
             commentListData.setCommentAuthor(commentAuthorList.get(loopInteger));
             commentListData.setCommentText(commentTextList.get(loopInteger));
 
-            // Add this object into the ArrayList myList
+            // Add this object into the ArrayList myList that gonna represent the commentFlow.
             myList.add(commentListData);
             loopInteger++;
         }
@@ -290,7 +293,9 @@ public class CommentFragment extends ListFragment {
 
     /**
      * This method is used when the user want to refresh a fragment.
-     * It will load the right data again and after that set a new list adapter.
+     * It will load the right data again in the getDataInList method
+     * and after that set a new list adapter.
+     * It will also reset the comment editTextView if the user just added one post.
      */
     public void refreshFragment() {
         getDataInList();

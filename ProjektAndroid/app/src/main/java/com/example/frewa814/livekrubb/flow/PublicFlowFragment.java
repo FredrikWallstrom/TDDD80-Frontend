@@ -82,7 +82,7 @@ public class PublicFlowFragment extends ListFragment {
         getDataInList();
 
         // Make custom adapter and set it to the listview.
-        FlowListAdapter adapter = new FlowListAdapter(getActivity(), myList, this);
+        FlowListAdapter adapter = new FlowListAdapter(getActivity(), myList);
         setListAdapter(adapter);
     }
 
@@ -236,7 +236,7 @@ public class PublicFlowFragment extends ListFragment {
     public void refresh(){
         getDataInList();
         // Make custom adapter and set it to the listview.
-        FlowListAdapter adapter = new FlowListAdapter(getActivity(), myList, this);
+        FlowListAdapter adapter = new FlowListAdapter(getActivity(), myList);
         setListAdapter(adapter);
     }
 }

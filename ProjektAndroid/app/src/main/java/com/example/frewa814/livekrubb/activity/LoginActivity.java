@@ -56,6 +56,9 @@ public class LoginActivity extends Activity {
     private final static String USER_TAG = "user";
     private final static String PASSWORD_TAG = "password";
 
+    /**
+     * Fields for entered username and password by the user.
+     */
     private String mUsername;
     private String mPassword;
 
@@ -92,11 +95,11 @@ public class LoginActivity extends Activity {
     View.OnClickListener clickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            // Attempt to login.
+            // Attempt to login if the user click on sign in button.
             if (view.getId() == R.id.sign_in_button){
                 attemptLogin();
             }
-            // Change to register activity.
+            // Change to register activity if the user click on register button.
             else if (view.getId() == R.id.register_button){
                 finish();
                 Intent registerScreen = new Intent(getApplicationContext(), RegisterActivity.class);
