@@ -15,6 +15,7 @@ import android.widget.TextView;
 import com.example.frewa814.livekrubb.R;
 import com.example.frewa814.livekrubb.activity.MainActivity;
 import com.example.frewa814.livekrubb.asynctask.GetTask;
+import com.example.frewa814.livekrubb.flow.PublicFlowFragment;
 import com.example.frewa814.livekrubb.misc.OnButtonClickedListener;
 
 import org.json.JSONArray;
@@ -114,6 +115,7 @@ public class PersonalToplistFragment extends ListFragment implements AdapterView
         // Get all recipes in the database that's gonna represent the topList.
         getDataInList();
 
+        // Set the adapter to the listView.
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, recipeList);
         setListAdapter(adapter);
         getListView().setOnItemClickListener(this);
@@ -134,7 +136,7 @@ public class PersonalToplistFragment extends ListFragment implements AdapterView
         // recipe when the user click on one recipe.
         recipeIDList = new ArrayList<>();
 
-        JSONArray recipes = MainActivity.allPosts;
+        JSONArray recipes = PublicFlowFragment.allPosts;
         if (recipes != null) {
             try {
                 // Go through all recipes and if the recipe is posted by the user

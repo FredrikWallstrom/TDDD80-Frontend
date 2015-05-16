@@ -10,7 +10,8 @@ import org.json.JSONObject;
  */
 public interface OnButtonClickedListener {
     void onButtonClicked(View view);
-    void onTaskDone();
+    void onTaskDone(String previousFragment);
     void onShowRecipeButtonClicked(JSONObject recipe);
     void onButtonClicked(String id, String nextFragment);
+    void onShareRecipeButtonClicked(String previousFragment);
 }

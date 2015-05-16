@@ -48,8 +48,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-
-
 /**
  * This class will show the fragment where you can share a recipe on the flow.
  * In other words, this class will handle how to make a post on the flow.
@@ -103,6 +101,11 @@ public class ShareRecipeFragment extends Fragment implements GoogleApiClient.Con
     private TextView mLocationView;
 
     /**
+     * Save the previous fragment.
+     */
+    private String mPreviousFragment;
+
+    /**
      * Runs first when fragment is created.
      */
     @Override
@@ -120,6 +123,8 @@ public class ShareRecipeFragment extends Fragment implements GoogleApiClient.Con
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString() + " must implement OnButtonClickedListener ");
         }
+
+        mPreviousFragment = getArguments().getString("previousFragment");
     }
 
     /**
@@ -175,7 +180,7 @@ public class ShareRecipeFragment extends Fragment implements GoogleApiClient.Con
     View.OnClickListener clickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            // Check if the user clicked on fetchAdressButton.
+            // Check if the user clicked on fetchAddressButton.
             if (view.getId() == R.id.fetch_adress_button){
                 final LocationManager manager = (LocationManager) getActivity().getSystemService( Context.LOCATION_SERVICE );
 
@@ -304,6 +309,9 @@ public class ShareRecipeFragment extends Fragment implements GoogleApiClient.Con
         }
     }
 
+    /**
+     * This method will run when we are connected to googleClient and call on startIntent.
+     */
     @Override
     public void onConnected(Bundle bundle) {
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
@@ -315,6 +323,9 @@ public class ShareRecipeFragment extends Fragment implements GoogleApiClient.Con
         }
     }
 
+    /**
+     * This method will start the service with the FetchAddressIntentService class.
+     */
     protected void startIntentService() {
         Intent intent = new Intent(getActivity(), FetchAddressIntentService.class);
         intent.putExtra(Constants.RECEIVER, mResultReceiver);
@@ -322,6 +333,9 @@ public class ShareRecipeFragment extends Fragment implements GoogleApiClient.Con
         getActivity().startService(intent);
     }
 
+    /**
+     * This method will set the adress output to the locationView.
+     */
     private void displayAddressOutput() {
         mLocationView.setText(mAddressOutput);
     }
@@ -342,7 +356,9 @@ public class ShareRecipeFragment extends Fragment implements GoogleApiClient.Con
     public void onConnectionFailed(ConnectionResult connectionResult) {
     }
 
-
+    /**
+     * Private class that will get the result from the fetchAddressIntent service.
+     */
     private class AddressResultReceiver extends ResultReceiver {
         public AddressResultReceiver(android.os.Handler handler) {
             super(handler);
@@ -356,7 +372,6 @@ public class ShareRecipeFragment extends Fragment implements GoogleApiClient.Con
             displayAddressOutput();
         }
     }
-
 
     /**
      * Private anonymous class that will do one asyncTask so we can handle the httpRequest.
@@ -404,7 +419,7 @@ public class ShareRecipeFragment extends Fragment implements GoogleApiClient.Con
                     serverError.show();
                     break;
                 default:
-                    mListener.onTaskDone();
+                    mListener.onTaskDone(mPreviousFragment);
                     break;
             }
         }

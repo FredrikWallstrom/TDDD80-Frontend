@@ -27,22 +27,32 @@ import java.util.Comparator;
 import java.util.concurrent.ExecutionException;
 
 /**
- * Created by Fredrik on 2015-04-24.
+ * Fragment that will display a topList of all recipes in the database.
  */
 public class TopListFragment extends ListFragment implements AdapterView.OnItemClickListener {
 
-    private static final String POSTS_TAG = "posts";
+    /**
+     * Constant tags for http requests.
+     */
     private static final String ID_TAG = "id";
     private static final String LIKES_TAG = "likes";
     private static final String RECIPE_NAME_TAG = "recipe_name";
     private static final String POST_TAG = "post";
+
+    /**
+     * Click listener instance that will point on MainActivity
+     * so the MainActivity can handle the clicks in the fragments.
+     */
     OnButtonClickedListener mListener;
+
     private ArrayList<String> recipeList;
     private ArrayList<String> recipeIDList;
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
+
+        // Make sure MainActivity is implementing the OnButtonClickedListener interface.
         try {
             mListener = (OnButtonClickedListener) activity;
         } catch (ClassCastException e) {
@@ -86,29 +96,36 @@ public class TopListFragment extends ListFragment implements AdapterView.OnItemC
         // Get all recipes in the database that's gonna represent the topList.
         getDataInList();
 
+        // Set the adapter to the listView.
         ArrayAdapter<String> adapter = new ArrayAdapter<String> (getActivity(), android.R.layout.simple_list_item_1, recipeList);
         setListAdapter(adapter);
         getListView().setOnItemClickListener(this);
     }
 
+    /**
+     * This method will get all data that is gonna represent the flow.
+     * It will add the data to a temp lists and then sort it by likes.
+     * After that it will go through the temp list and add the name on the recipe to the list
+     * that will represent the listView.
+     */
     private void getDataInList() {
-        recipeList = new ArrayList<>();
-        recipeIDList = new ArrayList<>();
+        // Temp list there we will save likes and the post id.
         ArrayList<String> tempList = new ArrayList<>();
-        JSONArray recipes;
-        String post_id;
-        JSONObject jsonObject;
-        JSONArray jsonArray;
-        String likes;
+        // Recipe list that will represent the listView.
+        recipeList = new ArrayList<>();
+        // List that will save the id's on the posts so we can take out right
+        // recipe when the user click on one recipe.
+        recipeIDList = new ArrayList<>();
 
-        recipes = MainActivity.allPosts;
+        JSONArray recipes = PublicFlowFragment.allPosts;
 
         if (recipes != null) {
             try {
+                // Go through all recipes and save it to the temp list.
                 for (int i = 0; i < recipes.length(); i++) {
-                    jsonObject = recipes.getJSONObject(i);
-                    post_id = jsonObject.getString(ID_TAG);
-                    likes = getAllLikesOnPost(post_id);
+                    JSONObject jsonObject = recipes.getJSONObject(i);
+                    String post_id = jsonObject.getString(ID_TAG);
+                    String likes = getAllLikesOnPost(post_id);
                     tempList.add(likes + " " + post_id);
                 }
             } catch (JSONException e) {
@@ -116,10 +133,15 @@ public class TopListFragment extends ListFragment implements AdapterView.OnItemC
             }
         }
 
-
+        // Sort the list by likes.
         tempList = sortListByLikes(tempList);
+
         Integer counter = 1;
         StringBuilder sb;
+        String recipe;
+        String recipeName = null;
+        // Go through the tempList and for every item, split the list and take out the post id
+        // and save it to the string builder.
         for (int i = 0; i < tempList.size(); i++) {
             sb = new StringBuilder();
             String element = tempList.get(i);
@@ -135,11 +157,12 @@ public class TopListFragment extends ListFragment implements AdapterView.OnItemC
                 }
             }
 
+            // Save the post id to the recipeIDList so we can take out the right id when the user
+            // click on one recipe in the fragment.
             recipeIDList.add(sb.toString());
 
-            String recipe;
-            String recipeName = null;
             try {
+                // Get the post by id that is in the stringBuilder.
                 recipe = new GetTask().execute(MainActivity.URL + "/get_post_by_id/" + sb).get();
             } catch (InterruptedException | ExecutionException e) {
                 recipe = "server error";
@@ -147,9 +170,10 @@ public class TopListFragment extends ListFragment implements AdapterView.OnItemC
             }
 
             if (!recipe.equals("server error")) {
+                // Get the recipe name on the post.
                 try {
-                    jsonObject = new JSONObject(recipe);
-                    jsonArray = jsonObject.getJSONArray(POST_TAG);
+                    JSONObject jsonObject = new JSONObject(recipe);
+                    JSONArray jsonArray = jsonObject.getJSONArray(POST_TAG);
                     jsonObject = jsonArray.getJSONObject(0);
                     recipeName = jsonObject.getString(RECIPE_NAME_TAG);
                 } catch (JSONException e) {
@@ -157,6 +181,8 @@ public class TopListFragment extends ListFragment implements AdapterView.OnItemC
                 }
             }
 
+            // Add the recipe name to the list that will represent the listView
+            // it will also add "counter" that will be the position in the topList.
             if (recipeName != null){
                 recipeList.add(counter + "." + " " + " " + recipeName);
             }
@@ -165,8 +191,11 @@ public class TopListFragment extends ListFragment implements AdapterView.OnItemC
         }
     }
 
-    private ArrayList sortListByLikes(ArrayList testList) {
-
+    /**
+     * This method will sort the tempList by likes, the first parameter in the list items
+     * will be the number of likes on each post.
+     */
+    private ArrayList<String> sortListByLikes(ArrayList<String> testList) {
         Collections.sort(testList, new Comparator<String>() {
             @Override
             public int compare(String lhs, String rhs) {
@@ -181,6 +210,9 @@ public class TopListFragment extends ListFragment implements AdapterView.OnItemC
         return testList;
     }
 
+    /**
+     * This method will get all likes on one post from the database.
+     */
     private String getAllLikesOnPost(String post_id) {
         String likes;
         JSONObject jsonObject;
@@ -207,15 +239,18 @@ public class TopListFragment extends ListFragment implements AdapterView.OnItemC
         return result;
     }
 
+    /**
+     * This method will handle the click on the recipes in the fragment.
+     */
     @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-
+        // Get the post id of the clicked post.
         String post_id = recipeIDList.get(position);
+
         String recipe;
         JSONObject jsonObject = null;
-        JSONArray jsonArray;
         try {
+            // Get the recipe from the database.
             recipe = new GetTask().execute(MainActivity.URL + "/get_post_by_id/" + post_id).get();
         } catch (InterruptedException | ExecutionException e) {
             recipe = "server error";
@@ -225,12 +260,13 @@ public class TopListFragment extends ListFragment implements AdapterView.OnItemC
         if (!recipe.equals("server error")) {
             try {
                 jsonObject = new JSONObject(recipe);
-                jsonArray = jsonObject.getJSONArray(POST_TAG);
+                JSONArray jsonArray = jsonObject.getJSONArray(POST_TAG);
                 jsonObject = jsonArray.getJSONObject(0);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
+        // Inform the activity that we gonna change fragment to ShowRecipeFragment.
         mListener.onShowRecipeButtonClicked(jsonObject);
     }
 }

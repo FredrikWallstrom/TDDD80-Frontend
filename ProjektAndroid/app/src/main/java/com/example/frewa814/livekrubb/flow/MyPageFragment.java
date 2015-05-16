@@ -210,7 +210,7 @@ public class MyPageFragment extends ListFragment {
         myList = new ArrayList<>();
 
         try {
-            JSONArray posts = MainActivity.allPosts;
+            JSONArray posts = PublicFlowFragment.allPosts;
             if (posts != null) {
                 if (posts.length() != 0) {
                     // Go through all posts and if posts is equal to the user id that is displayed
@@ -315,7 +315,6 @@ public class MyPageFragment extends ListFragment {
             }
         }
     };
-
 
     /**
      * This method is used when the user want to refresh a fragment.

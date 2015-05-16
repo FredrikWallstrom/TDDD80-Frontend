@@ -23,7 +23,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.SearchView;
-import android.widget.Toast;
 
 import com.example.frewa814.livekrubb.R;
 import com.example.frewa814.livekrubb.adapters.SearchUserAdapter;
@@ -45,8 +44,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
@@ -60,14 +57,12 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
      * We will load the allPosts field when we creating the activity.
      */
     public final static String URL = "http://livekrubb-frewa814.openshift.ida.liu.se";
-    public static JSONArray allPosts;
 
     /**
      * Constant tags for http requests.
      */
     private static final String USER_TAG = "users";
     private static final String USERNAME_TAG = "username";
-    private static final String POST_TAG = "posts";
     private static final String ID_TAG = "id";
 
     /**
@@ -120,10 +115,6 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
 
         // Init all registered users (get them from the database).
         allUsers = getAllUsers();
-        // Init all posts (get them from the database).
-        allPosts = getPosts();
-        // Sort the posts by timestamp.
-        allPosts = getPostsSorted();
 
         // Check that the activity is using the layout version with
         // the fragment_container FrameLayout
@@ -189,7 +180,7 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
                         }
                     }
                     // Check if we added someone to the temp list.
-                    if (searchedUserNames.size() != 0){
+                    if (searchedUserNames.size() != 0) {
                         try {
                             // Get the first user that is represented in the temp list.
                             JSONObject jsonObject = searchedUserNames.get(0);
@@ -414,40 +405,6 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
     }
 
     /**
-     * I Implemented an own sort method that's is sorting the posts by the timestamp column.
-     */
-    private JSONArray getPostsSorted() {
-        List<JSONObject> jsonValues = new ArrayList<>();
-        for (int i = 0; i < allPosts.length(); i++)
-            try {
-                jsonValues.add(allPosts.getJSONObject(i));
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        Collections.sort(jsonValues, new Comparator<JSONObject>() {
-            @Override
-            public int compare(JSONObject lhs, JSONObject rhs) {
-                String valA = "";
-                String valB = "";
-                try {
-                    valA = lhs.getString("timestamp");
-                    valB = rhs.getString("timestamp");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-                int comp = valA.compareTo(valB);
-                if (comp > 0)
-                    return -1;
-                if (comp < 0)
-                    return 1;
-                return 0;
-            }
-        });
-        return new JSONArray(jsonValues);
-    }
-
-    /**
      * This method will hide the keyboard if it is visible.
      */
     private void hideKeyboard() {
@@ -519,16 +476,6 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
                 ft.commit();
                 break;
 
-            // Case share recipe button.
-            // Change to the ShareRecipeFragment.
-            case R.id.share_recipe_button:
-                // Change to ShareRecipeFragment if we go from FlowFragment or CreateRecipeFragment.
-                ShareRecipeFragment shareRecipeFragment = new ShareRecipeFragment();
-                ft.replace(R.id.fragment_container, shareRecipeFragment);
-                ft.addToBackStack(null);
-                ft.commit();
-                break;
-
             // Case back button, just do a normal onBackPressed.
             case R.id.back_button:
                 onBackPressed();
@@ -544,7 +491,7 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
      * and replace it with the previous fragment there the user was before ShareRecipeFragment.
      */
     @Override
-    public void onTaskDone() {
+    public void onTaskDone(String previousFragment) {
         // Show the actionbar.
         ActionBar actionBar = this.getActionBar();
         if (actionBar != null) {
@@ -553,19 +500,15 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
         FragmentManager fm = getFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
 
-        // Get the fragment that the user are in then he click on the refresh button.
-        Fragment oldFragment = getFragmentManager().findFragmentById(R.id.fragment_container);
-
         // Check if the user clicked on ShareRecipe button from the public flow
         // or followers flow fragment.
-        if (oldFragment instanceof PublicFlowFragment){
+        if (previousFragment.equals("PublicFlowFragment")){
             PublicFlowFragment publicFlowFragment = new PublicFlowFragment();
             ft.replace(R.id.fragment_container, publicFlowFragment);
         }
         else {
             FollowersFlowListFragment followersFlowListFragment = new FollowersFlowListFragment();
             ft.replace(R.id.fragment_container, followersFlowListFragment);
-
         }
         ft.commit();
     }
@@ -643,32 +586,21 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
         }
     }
 
-    /**
-     * Get all posts from the database.
-     */
-    private JSONArray getPosts() {
-        String result;
-        JSONObject jsonObject;
-        JSONArray jsonArray;
-        try {
-            result = new GetTask().execute(MainActivity.URL + "/all_posts").get();
-        } catch (InterruptedException | ExecutionException e) {
-            result = "server error";
-            e.printStackTrace();
-        }
+    @Override
+    public void onShareRecipeButtonClicked(String previousFragment) {
+        FragmentManager fm = getFragmentManager();
+        FragmentTransaction ft = fm.beginTransaction();
+        // Change to ShareRecipeFragment if we go from FlowFragment or CreateRecipeFragment.
 
-        if (!result.equals("server error")) {
-            try {
-                jsonObject = new JSONObject(result);
-                jsonArray = jsonObject.getJSONArray(POST_TAG);
-                return jsonArray;
-            } catch (JSONException e) {
-                return new JSONArray();
-            }
-        } else {
-            return null;
-        }
+        // Send an bundle with fragment transaction that is gonna represent the ShowRecipeFragment.
+        Bundle bundle = new Bundle();
+        bundle.putString("previousFragment", previousFragment);
 
+        ShareRecipeFragment shareRecipeFragment = new ShareRecipeFragment();
+        ft.replace(R.id.fragment_container, shareRecipeFragment);
+        shareRecipeFragment.setArguments(bundle);
+        ft.addToBackStack(null);
+        ft.commit();
     }
 
     /**
@@ -690,7 +622,7 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
             if (mAccel > 15) {
                 Random rand = new Random();
 
-                JSONArray jsonArray = allPosts;
+                JSONArray jsonArray = PublicFlowFragment.allPosts;
 
                 int randomNum = rand.nextInt(jsonArray.length());
 

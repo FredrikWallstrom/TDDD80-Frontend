@@ -120,7 +120,7 @@ public class FollowersFlowListFragment extends ListFragment {
         JSONArray posts;
         String followers;
 
-        posts = MainActivity.allPosts;
+        posts = PublicFlowFragment.allPosts;
         if (posts != null) {
             if (posts.length() != 0) {
                 // Get all all user that the activated user follows.
@@ -202,7 +202,7 @@ public class FollowersFlowListFragment extends ListFragment {
     View.OnClickListener clickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            mListener.onButtonClicked(view);
+            mListener.onShareRecipeButtonClicked("FollowersFlowListFragment");
         }
     };
 

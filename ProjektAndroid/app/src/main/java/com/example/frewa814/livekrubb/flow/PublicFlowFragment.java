@@ -41,6 +41,7 @@ public class PublicFlowFragment extends ListFragment {
     private static final String USER_TAG = "user";
     private static final String ID_TAG = "id";
     private static final String LOCATION_TAG = "location";
+    private static final String POST_TAG = "posts";
 
     /**
      * This is the list that will be presented in the list view.
@@ -52,6 +53,11 @@ public class PublicFlowFragment extends ListFragment {
      * so the MainActivity can handle the clicks in the fragments.
      */
     OnButtonClickedListener mListener;
+
+    /**
+     * JSONArray with all posts in the database.
+     */
+    public static JSONArray allPosts;
 
     @Override
     public void onAttach(Activity activity) {
@@ -114,13 +120,16 @@ public class PublicFlowFragment extends ListFragment {
         myList = new ArrayList<>();
 
         try {
-            JSONArray posts = MainActivity.allPosts;
-            if (posts != null) {
-                if (posts.length() != 0) {
+            // get all posts from database.
+            allPosts = getPosts();
+            // Sort the posts by timestamp.
+            allPosts = getPostsSorted();
+            if (allPosts != null) {
+                if (allPosts.length() != 0) {
 
                     // Go through all posts and save them in the temp lists.
-                    for (int i = 0; i < posts.length(); i++) {
-                        JSONObject object = posts.getJSONObject(i);
+                    for (int i = 0; i < allPosts.length(); i++) {
+                        JSONObject object = allPosts.getJSONObject(i);
 
                         String recipeName = object.getString(RECIPE_NAME_TAG);
                         String postInformation = object.getString(POST_INFORMATION_TAG);
@@ -170,7 +179,7 @@ public class PublicFlowFragment extends ListFragment {
     View.OnClickListener clickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            mListener.onButtonClicked(view);
+            mListener.onShareRecipeButtonClicked("PublicFlowFragment");
         }
     };
 
@@ -212,6 +221,68 @@ public class PublicFlowFragment extends ListFragment {
         // Make custom adapter and set it to the listView.
         FlowListAdapter adapter = new FlowListAdapter(getActivity(), myList);
         setListAdapter(adapter);
+    }
+
+    /**
+     * I Implemented an own sort method that's is sorting the posts by the timestamp column.
+     */
+    private JSONArray getPostsSorted() {
+        List<JSONObject> jsonValues = new ArrayList<>();
+        for (int i = 0; i < allPosts.length(); i++)
+            try {
+                jsonValues.add(allPosts.getJSONObject(i));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        Collections.sort(jsonValues, new Comparator<JSONObject>() {
+            @Override
+            public int compare(JSONObject lhs, JSONObject rhs) {
+                String valA = "";
+                String valB = "";
+                try {
+                    valA = lhs.getString("timestamp");
+                    valB = rhs.getString("timestamp");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                int comp = valA.compareTo(valB);
+                if (comp > 0)
+                    return -1;
+                if (comp < 0)
+                    return 1;
+                return 0;
+            }
+        });
+        return new JSONArray(jsonValues);
+    }
+
+    /**
+     * Get all posts from the database.
+     */
+    private JSONArray getPosts() {
+        String result;
+        JSONObject jsonObject;
+        JSONArray jsonArray;
+        try {
+            result = new GetTask().execute(MainActivity.URL + "/all_posts").get();
+        } catch (InterruptedException | ExecutionException e) {
+            result = "server error";
+            e.printStackTrace();
+        }
+
+        if (!result.equals("server error")) {
+            try {
+                jsonObject = new JSONObject(result);
+                jsonArray = jsonObject.getJSONArray(POST_TAG);
+                return jsonArray;
+            } catch (JSONException e) {
+                return new JSONArray();
+            }
+        } else {
+            return null;
+        }
+
     }
 }
 

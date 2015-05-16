@@ -57,7 +57,6 @@ public class FollowTask extends AsyncTask<Void, Void, String> {
         return result;
     }
 
-
     /**
      * This method will make a post to the database and follow or unFollow one user
      * depend if the user already follows the user or not.
