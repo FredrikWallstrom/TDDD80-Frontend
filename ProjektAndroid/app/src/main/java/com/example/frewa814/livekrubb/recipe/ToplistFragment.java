@@ -97,7 +97,7 @@ public class TopListFragment extends ListFragment implements AdapterView.OnItemC
         getDataInList();
 
         // Set the adapter to the listView.
-        ArrayAdapter<String> adapter = new ArrayAdapter<String> (getActivity(), android.R.layout.simple_list_item_1, recipeList);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, recipeList);
         setListAdapter(adapter);
         getListView().setOnItemClickListener(this);
     }
@@ -143,51 +143,53 @@ public class TopListFragment extends ListFragment implements AdapterView.OnItemC
         // Go through the tempList and for every item, split the list and take out the post id
         // and save it to the string builder.
         for (int i = 0; i < tempList.size(); i++) {
-            sb = new StringBuilder();
-            String element = tempList.get(i);
-            String[] splitedList = element.split(" ");
-            Boolean firstRun = true;
-            for (String s : splitedList) {
-                if (!firstRun){
-                    if (counter <= 5){
+            if (counter <= 5) {
+
+
+                sb = new StringBuilder();
+                String element = tempList.get(i);
+                String[] splitedList = element.split(" ");
+                Boolean firstRun = true;
+                for (String s : splitedList) {
+                    if (!firstRun) {
                         sb.append(s);
+                    } else {
+                        firstRun = false;
                     }
-                }else{
-                    firstRun = false;
                 }
-            }
 
-            // Save the post id to the recipeIDList so we can take out the right id when the user
-            // click on one recipe in the fragment.
-            recipeIDList.add(sb.toString());
+                // Save the post id to the recipeIDList so we can take out the right id when the user
+                // click on one recipe in the fragment.
+                recipeIDList.add(sb.toString());
 
-            try {
-                // Get the post by id that is in the stringBuilder.
-                recipe = new GetTask().execute(MainActivity.URL + "/get_post_by_id/" + sb).get();
-            } catch (InterruptedException | ExecutionException e) {
-                recipe = "server error";
-                e.printStackTrace();
-            }
-
-            if (!recipe.equals("server error")) {
-                // Get the recipe name on the post.
                 try {
-                    JSONObject jsonObject = new JSONObject(recipe);
-                    JSONArray jsonArray = jsonObject.getJSONArray(POST_TAG);
-                    jsonObject = jsonArray.getJSONObject(0);
-                    recipeName = jsonObject.getString(RECIPE_NAME_TAG);
-                } catch (JSONException e) {
+                    // Get the post by id that is in the stringBuilder.
+                    recipe = new GetTask().execute(MainActivity.URL + "/get_post_by_id/" + sb).get();
+                } catch (InterruptedException | ExecutionException e) {
+                    recipe = "server error";
                     e.printStackTrace();
                 }
-            }
 
-            // Add the recipe name to the list that will represent the listView
-            // it will also add "counter" that will be the position in the topList.
-            if (recipeName != null){
-                recipeList.add(counter + "." + " " + " " + recipeName);
-            }
+                if (!recipe.equals("server error")) {
+                    // Get the recipe name on the post.
+                    try {
+                        JSONObject jsonObject = new JSONObject(recipe);
+                        JSONArray jsonArray = jsonObject.getJSONArray(POST_TAG);
+                        jsonObject = jsonArray.getJSONObject(0);
+                        recipeName = jsonObject.getString(RECIPE_NAME_TAG);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
 
-            counter ++;
+                // Add the recipe name to the list that will represent the listView
+                // it will also add "counter" that will be the position in the topList.
+                if (recipeName != null) {
+                    recipeList.add(counter + "." + " " + " " + recipeName);
+                }
+
+                counter++;
+            }
         }
     }
 
@@ -233,7 +235,7 @@ public class TopListFragment extends ListFragment implements AdapterView.OnItemC
                 e.printStackTrace();
             }
         }
-        if (jsonArray != null){
+        if (jsonArray != null) {
             result = String.valueOf(jsonArray.length());
         }
         return result;
@@ -243,7 +245,7 @@ public class TopListFragment extends ListFragment implements AdapterView.OnItemC
      * This method will handle the click on the recipes in the fragment.
      */
     @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         // Get the post id of the clicked post.
         String post_id = recipeIDList.get(position);
 

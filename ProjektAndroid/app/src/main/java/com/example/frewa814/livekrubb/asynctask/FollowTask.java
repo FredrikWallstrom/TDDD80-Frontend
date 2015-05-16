@@ -46,7 +46,6 @@ public class FollowTask extends AsyncTask<Void, Void, String> {
     protected String doInBackground(Void... params) {
         String result;
         String dict = makePost();
-
         try {
             JSONObject jsonObject = new JSONObject(dict);
             result = jsonObject.getString(RESULT_TAG);

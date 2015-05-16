@@ -122,8 +122,7 @@ public class PublicFlowFragment extends ListFragment {
         try {
             // get all posts from database.
             allPosts = getPosts();
-            // Sort the posts by timestamp.
-            allPosts = getPostsSorted();
+
             if (allPosts != null) {
                 if (allPosts.length() != 0) {
 
@@ -221,40 +220,6 @@ public class PublicFlowFragment extends ListFragment {
         // Make custom adapter and set it to the listView.
         FlowListAdapter adapter = new FlowListAdapter(getActivity(), myList);
         setListAdapter(adapter);
-    }
-
-    /**
-     * I Implemented an own sort method that's is sorting the posts by the timestamp column.
-     */
-    private JSONArray getPostsSorted() {
-        List<JSONObject> jsonValues = new ArrayList<>();
-        for (int i = 0; i < allPosts.length(); i++)
-            try {
-                jsonValues.add(allPosts.getJSONObject(i));
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        Collections.sort(jsonValues, new Comparator<JSONObject>() {
-            @Override
-            public int compare(JSONObject lhs, JSONObject rhs) {
-                String valA = "";
-                String valB = "";
-                try {
-                    valA = lhs.getString("timestamp");
-                    valB = rhs.getString("timestamp");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-                int comp = valA.compareTo(valB);
-                if (comp > 0)
-                    return -1;
-                if (comp < 0)
-                    return 1;
-                return 0;
-            }
-        });
-        return new JSONArray(jsonValues);
     }
 
     /**
