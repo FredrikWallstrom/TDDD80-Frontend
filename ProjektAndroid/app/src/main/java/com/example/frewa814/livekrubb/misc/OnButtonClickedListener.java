@@ -9,8 +9,8 @@ import org.json.JSONObject;
  * The activity is interested in buttons click and will handle the fragment transactions.
  */
 public interface OnButtonClickedListener {
-    public void onButtonClicked(View view);
-    public void onTaskDone();
-    public void onShowRecipeButtonClicked(JSONObject recipe);
-    public void onButtonClicked(String id, String nextFragment);
+    void onButtonClicked(View view);
+    void onTaskDone();
+    void onShowRecipeButtonClicked(JSONObject recipe);
+    void onButtonClicked(String id, String nextFragment);
 }

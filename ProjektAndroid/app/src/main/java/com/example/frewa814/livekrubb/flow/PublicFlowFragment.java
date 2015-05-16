@@ -3,12 +3,10 @@ package com.example.frewa814.livekrubb.flow;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.ListFragment;
-import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -29,11 +27,13 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 /**
- * Fragment that gonna represent the flow.
+ * Fragment that gonna represent the public flow.
  */
 public class PublicFlowFragment extends ListFragment {
 
-
+    /**
+     * Constant tags for http requests.
+     */
     private static final String RECIPE_NAME_TAG = "recipe_name";
     private static final String POST_INFORMATION_TAG = "post_information";
     private static final String POST_AUTHOR_ID_TAG = "user_id";
@@ -42,14 +42,22 @@ public class PublicFlowFragment extends ListFragment {
     private static final String ID_TAG = "id";
     private static final String LOCATION_TAG = "location";
 
+    /**
+     * This is the list that will be presented in the list view.
+     */
+    private ArrayList<FlowListData> myList;
 
-    private ArrayList myList;
+    /**
+     * Click listener instance that will point on MainActivity
+     * so the MainActivity can handle the clicks in the fragments.
+     */
     OnButtonClickedListener mListener;
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
 
+        // Make sure MainActivity is implementing the OnButtonClickedListener interface.
         try {
             mListener = (OnButtonClickedListener) activity;
         } catch (ClassCastException e) {
@@ -75,18 +83,26 @@ public class PublicFlowFragment extends ListFragment {
     }
 
     @Override
-     public void onActivityCreated(Bundle savedInstanceState) {
+    public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
         // Get all posts in the database that's gonna represent the flow.
         getDataInList();
 
-        // Make custom adapter and set it to the listview.
+        // Make custom adapter and set it to the listView.
         FlowListAdapter adapter = new FlowListAdapter(getActivity(), myList);
         setListAdapter(adapter);
     }
 
+    /**
+     * This method will get all data that is gonna represent the flow.
+     * It will add the data to a temp lists and then create one FlowListData
+     * object for every items in the temp list.
+     * And after that it will add the object to the list that will
+     * be sent to the FlowListAdapter.
+     */
     private void getDataInList() {
+        // Temp list there all information will be saved.
         List<String> recipeNameList = new ArrayList<>();
         List<String> postInformationList = new ArrayList<>();
         List<String> postAuthorList = new ArrayList<>();
@@ -94,16 +110,15 @@ public class PublicFlowFragment extends ListFragment {
         List<JSONObject> recipeList = new ArrayList<>();
         List<String> locationList = new ArrayList<>();
 
-        myList = new ArrayList();
-        JSONArray posts;
-
-        posts = MainActivity.allPosts;
+        // The list that gonna represent the flow.
+        myList = new ArrayList<>();
 
         try {
+            JSONArray posts = MainActivity.allPosts;
             if (posts != null) {
                 if (posts.length() != 0) {
-                    posts = getPostsSorted(posts);
 
+                    // Go through all posts and save them in the temp lists.
                     for (int i = 0; i < posts.length(); i++) {
                         JSONObject object = posts.getJSONObject(i);
 
@@ -122,10 +137,6 @@ public class PublicFlowFragment extends ListFragment {
                         postAuthorList.add(postAuthor);
                         recipeList.add(object);
                     }
-
-                } else {
-                    Toast Error = Toast.makeText(getActivity(), "Your flow is empty. Search some friends and follow them!", Toast.LENGTH_LONG);
-                    Error.show();
                 }
             } else {
                 Toast serverError = Toast.makeText(getActivity(), "Failed to update, Try again!", Toast.LENGTH_LONG);
@@ -153,42 +164,8 @@ public class PublicFlowFragment extends ListFragment {
         }
     }
 
-    /**
-     * I Implemented an own sort method that's is sorting the posts by the timestamp column.
-     */
-    private JSONArray getPostsSorted(JSONArray posts) {
-        List<JSONObject> jsonValues = new ArrayList<>();
-        for (int i = 0; i <posts.length(); i++)
-            try {
-                jsonValues.add(posts.getJSONObject(i));
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        Collections.sort(jsonValues, new Comparator<JSONObject>() {
-            @Override
-            public int compare(JSONObject lhs, JSONObject rhs) {
-                String valA = "";
-                String valB = "";
-                try {
-                    valA = lhs.getString("timestamp");
-                    valB = rhs.getString("timestamp");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-                int comp = valA.compareTo(valB);
-                if(comp > 0)
-                    return -1;
-                if(comp < 0)
-                    return 1;
-                return 0;
-            }
-        });
-        return new JSONArray(jsonValues);
-    }
-
-
-    // When a button is clicked, notify the activity.
+    // Click listener for the share recipe button.
+    // When the button is clicked, notify the activity.
     // MainActivity will then create the new fragment.
     View.OnClickListener clickListener = new View.OnClickListener() {
         @Override
@@ -197,45 +174,42 @@ public class PublicFlowFragment extends ListFragment {
         }
     };
 
-
+    /**
+     * This method will get the post author username from the database from a given post id.
+     */
     public String getPostAuthor(String postAuthorID) {
-        {
-            String postAuthor;
-            String postAuthorName = null;
-            JSONObject jsonObject;
-            JSONArray jsonArray;
+        String postAuthor;
+        String postAuthorName = null;
+
+        try {
+            postAuthor = new GetTask().execute(MainActivity.URL + "/get_user_by_id/" + postAuthorID).get();
+        } catch (InterruptedException | ExecutionException e) {
+            postAuthor = "server error";
+            e.printStackTrace();
+        }
+
+        if (!postAuthor.equals("server error")) {
             try {
-                postAuthor = new GetTask().execute(MainActivity.URL + "/get_user_by_id/" + postAuthorID).get();
-            } catch (InterruptedException | ExecutionException e) {
-                postAuthor = "server error";
+                JSONObject jsonObject = new JSONObject(postAuthor);
+                JSONArray jsonArray = jsonObject.getJSONArray(USER_TAG);
+                jsonObject = jsonArray.getJSONObject(0);
+                postAuthorName = jsonObject.getString(USERNAME_TAG);
+            } catch (JSONException e) {
                 e.printStackTrace();
             }
-
-            if (!postAuthor.equals("server error")) {
-                try {
-                    jsonObject = new JSONObject(postAuthor);
-                    jsonArray = jsonObject.getJSONArray(USER_TAG);
-                    jsonObject = jsonArray.getJSONObject(0);
-                    postAuthorName = jsonObject.getString(USERNAME_TAG);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-            return postAuthorName;
         }
+        return postAuthorName;
+
     }
 
-    private void hideKeyboard() {
-        View view = getActivity().getCurrentFocus();
-        if (view != null) {
-            InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-            inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-        }
-    }
-
-    public void refresh(){
+    /**
+     * This method is used when the user want to refresh a fragment.
+     * It will load the right data again in the getDataInList method
+     * and after that set a new list adapter.
+     */
+    public void refresh() {
         getDataInList();
-        // Make custom adapter and set it to the listview.
+        // Make custom adapter and set it to the listView.
         FlowListAdapter adapter = new FlowListAdapter(getActivity(), myList);
         setListAdapter(adapter);
     }

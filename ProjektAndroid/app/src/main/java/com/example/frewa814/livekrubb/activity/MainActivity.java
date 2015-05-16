@@ -45,6 +45,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
@@ -120,6 +122,8 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
         allUsers = getAllUsers();
         // Init all posts (get them from the database).
         allPosts = getPosts();
+        // Sort the posts by timestamp.
+        allPosts = getPostsSorted();
 
         // Check that the activity is using the layout version with
         // the fragment_container FrameLayout
@@ -409,6 +413,39 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
         }, WAIT_TIME);
     }
 
+    /**
+     * I Implemented an own sort method that's is sorting the posts by the timestamp column.
+     */
+    private JSONArray getPostsSorted() {
+        List<JSONObject> jsonValues = new ArrayList<>();
+        for (int i = 0; i < allPosts.length(); i++)
+            try {
+                jsonValues.add(allPosts.getJSONObject(i));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        Collections.sort(jsonValues, new Comparator<JSONObject>() {
+            @Override
+            public int compare(JSONObject lhs, JSONObject rhs) {
+                String valA = "";
+                String valB = "";
+                try {
+                    valA = lhs.getString("timestamp");
+                    valB = rhs.getString("timestamp");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                int comp = valA.compareTo(valB);
+                if (comp > 0)
+                    return -1;
+                if (comp < 0)
+                    return 1;
+                return 0;
+            }
+        });
+        return new JSONArray(jsonValues);
+    }
 
     /**
      * This method will hide the keyboard if it is visible.

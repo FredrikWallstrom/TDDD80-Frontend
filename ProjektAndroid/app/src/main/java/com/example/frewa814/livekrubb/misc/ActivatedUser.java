@@ -9,13 +9,26 @@ import org.json.JSONObject;
  */
 public class ActivatedUser {
 
+
+    /**
+     * Constant tags for http requests.
+     */
     private static final String PROFILE_PICTURE_TAG = "profile_picture";
     private static final String USERNAME_TAG = "username";
     private static final String ID_TAG = "id";
+
+    /**
+     * Fields that are static so we can get this information in every fragment/activity
+     * there we need them.
+     */
     public static String activatedProfilePicture;
     public static String activatedUsername;
     public static String activatedUserID;
 
+    /**
+     * Constructor for this class, will be running when one user succeed to log in.
+     * Will take one JSONObject with the user as input.
+     */
     public ActivatedUser(JSONObject jsonObject) {
         try {
             activatedUserID = jsonObject.getString(ID_TAG);

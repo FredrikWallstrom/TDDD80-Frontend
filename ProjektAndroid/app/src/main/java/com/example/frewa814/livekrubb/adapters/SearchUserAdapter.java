@@ -28,7 +28,7 @@ public class SearchUserAdapter extends CursorAdapter {
     /**
      * Constructor for the class that will init items that gonna represent the list in the cursor.
      */
-    SearchUserAdapter(Context context, Cursor cursor, List<String> items) {
+    public SearchUserAdapter(Context context, Cursor cursor, List<String> items) {
         super(context, cursor, false);
         this.items = items;
     }

@@ -28,29 +28,42 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 /**
- * Created by Fredrik on 2015-04-22.
+ * Fragment that will display the MyPageFragment (profile page).
  */
 public class MyPageFragment extends ListFragment {
 
-    private static final String USER_ID_TAG = "user_id";
-    private static final String USERS_TAG = "users";
-    private ArrayList<FlowListData> myList;
-    private String mUserID;
+    /**
+     * Constant tags for http requests.
+     */
     private static final String RECIPE_NAME_TAG = "recipe_name";
     private static final String POST_INFORMATION_TAG = "post_information";
     private static final String USERNAME_TAG = "username";
     private static final String USER_TAG = "user";
     private static final String ID_TAG = "id";
     private static final String LOCATION_TAG = "location";
-    private TextView nameView;
-    private Button followButton;
+    private static final String USER_ID_TAG = "user_id";
+    private static final String USERS_TAG = "users";
+
+    /**
+     * This is the list that will be presented in the list view.
+     */
+    private ArrayList<FlowListData> myList;
+
+    /**
+     * Click listener instance that will point on MainActivity
+     * so the MainActivity can handle the clicks in the fragments.
+     */
     OnButtonClickedListener mListener;
 
+    private String mUserID;
+    private TextView nameView;
+    private Button followButton;
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
 
+        // Make sure MainActivity is implementing the OnButtonClickedListener interface.
         try {
             mListener = (OnButtonClickedListener) activity;
         } catch (ClassCastException e) {
@@ -70,16 +83,19 @@ public class MyPageFragment extends ListFragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.my_page, container, false);
 
+        // Find the buttons in the xml and set a click listener on them.
         nameView = (TextView) rootView.findViewById(R.id.name_my_page);
         followButton = (Button) rootView.findViewById(R.id.follow_button);
         Button personalToplist = (Button) rootView.findViewById(R.id.personal_toplist_button);
         personalToplist.setOnClickListener(clickListener);
         followButton.setOnClickListener(clickListener);
 
+        // Get information that have been sent from activity to this fragment.
+        // This is the user id on user that is gonna be represented in the fragment.
         mUserID = getArguments().getString("id");
 
+        // Set the right username to the nameView field.
         setInformationAboutUser();
-
         return rootView;
     }
 
@@ -87,8 +103,10 @@ public class MyPageFragment extends ListFragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        // Check if the user that is on the profile page is followed by the activated user.
         boolean following = checkIfFollow();
 
+        // If the activated user follow the profiled user, set the button to unfollow.
         if (following) {
             followButton.setText("Unfollow");
         }
@@ -101,10 +119,15 @@ public class MyPageFragment extends ListFragment {
         setListAdapter(adapter);
     }
 
+    /**
+     * This method will check if the activated person follows the user that is represented
+     * in the MyPageFragment.
+     */
     private boolean checkIfFollow() {
         String users;
-        JSONObject jsonObject;
-        JSONArray jsonArray;
+
+        // Check if the activated user is looking on his own page.
+        // If yes, set the button to unClickable.
         if (!mUserID.equals(ActivatedUser.activatedUserID)) {
             try {
                 users = new GetTask().execute(MainActivity.URL + "/get_followers_by_id/" + mUserID).get();
@@ -115,11 +138,13 @@ public class MyPageFragment extends ListFragment {
 
             if (!users.equals("server error")) {
                 try {
-                    jsonObject = new JSONObject(users);
-                    jsonArray = jsonObject.getJSONArray(USERS_TAG);
+                    JSONObject jsonObject = new JSONObject(users);
+                    JSONArray jsonArray = jsonObject.getJSONArray(USERS_TAG);
                     for (int i = 0; i < jsonArray.length(); i++) {
                         jsonObject = jsonArray.getJSONObject(i);
                         String userID = jsonObject.getString(ID_TAG);
+                        // Go through all users that is following the user that is displayed in the fragment.
+                        // If one of them is the activated user, return true.
                         if (userID.equals(ActivatedUser.activatedUserID)) {
                             return true;
                         }
@@ -128,13 +153,16 @@ public class MyPageFragment extends ListFragment {
                     e.printStackTrace();
                 }
             }
-
         } else {
             followButton.setClickable(false);
         }
         return false;
     }
 
+    /**
+     * This method will set the username on the user that is gonna be displayed in the fragment
+     * on the nameView.
+     */
     private void setInformationAboutUser() {
         String user;
         JSONObject jsonObject;
@@ -162,22 +190,32 @@ public class MyPageFragment extends ListFragment {
         }
     }
 
-
+    /**
+     * This method will get all data that is gonna represent the flow.
+     * It will add the data to a temp lists and then create one FlowListData
+     * object for every items in the temp list.
+     * And after that it will add the object to the list that will
+     * be sent to the FlowListAdapter.
+     */
     private void getDataInList() {
+        // Temp list there all information will be saved.
         List<String> recipeNameList = new ArrayList<>();
         List<String> postInformationList = new ArrayList<>();
         List<String> postAuthorList = new ArrayList<>();
         List<String> postIDList = new ArrayList<>();
         List<String> locationList = new ArrayList<>();
-        myList = new ArrayList<>();
-        JSONArray posts;
         List<JSONObject> recipeList = new ArrayList<>();
 
+        // The list that gonna represent the flow.
+        myList = new ArrayList<>();
 
         try {
-            posts = MainActivity.allPosts;
+            JSONArray posts = MainActivity.allPosts;
             if (posts != null) {
                 if (posts.length() != 0) {
+                    // Go through all posts and if posts is equal to the user id that is displayed
+                    // on the fragment, add the post to the temp lists.
+                    // So we can show only the posts that the displayed user have been posted to the list.
                     for (int i = 0; i < posts.length(); i++) {
                         JSONObject object = posts.getJSONObject(i);
 
@@ -225,7 +263,7 @@ public class MyPageFragment extends ListFragment {
     }
 
     /**
-     * Get the posts author from the database.
+     * Get the posts authors username from the database from a given user id..
      */
     private String getPostAuthor(String postAuthorID) {
         String postAuthor;
@@ -252,18 +290,20 @@ public class MyPageFragment extends ListFragment {
         return postAuthorName;
     }
 
-    // When a button is clicked, notify the activity.
-    // MainActivity will then create the new fragment.
+    // Click listener for the buttons in the xml.
     View.OnClickListener clickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
+
+            // Check if the user clicked on the personal topList button.
             if (view.getId() == R.id.personal_toplist_button) {
                 mListener.onButtonClicked(mUserID, "PersonalToplistFragment");
+
+            // Else, the user clicked on the follow button.
             } else {
                 FollowTask followTask = new FollowTask(ActivatedUser.activatedUserID, mUserID);
                 try {
                     String result = followTask.execute((Void) null).get();
-                    System.out.println(result);
                     if (result.equals("un_followed")) {
                         followButton.setText("Follow");
                     } else {
@@ -276,6 +316,12 @@ public class MyPageFragment extends ListFragment {
         }
     };
 
+
+    /**
+     * This method is used when the user want to refresh a fragment.
+     * It will load the right data again in the getDataInList method
+     * and after that set a new list adapter.
+     */
     public void refresh() {
         getDataInList();
         FlowListAdapter adapter = new FlowListAdapter(getActivity(), myList);
