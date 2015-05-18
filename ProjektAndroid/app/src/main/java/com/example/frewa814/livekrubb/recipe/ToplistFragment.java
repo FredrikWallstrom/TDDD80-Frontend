@@ -29,7 +29,7 @@ import java.util.concurrent.ExecutionException;
 /**
  * Fragment that will display a topList of all recipes in the database.
  */
-public class TopListFragment extends ListFragment implements AdapterView.OnItemClickListener {
+public class ToplistFragment extends ListFragment implements AdapterView.OnItemClickListener {
 
     /**
      * Constant tags for http requests.

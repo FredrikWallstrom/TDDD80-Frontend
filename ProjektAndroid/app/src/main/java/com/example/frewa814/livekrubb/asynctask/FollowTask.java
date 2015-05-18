@@ -28,7 +28,7 @@ public class FollowTask extends AsyncTask<Void, Void, String> {
     private static final String RESULT_TAG = "result";
 
     /**
-     * This fields will represent user_id´s on the one who want to follow
+     * This fields will represent user_id's on the one who want to follow
      * and on the one who is being followed.
      */
     private String followerID;
