@@ -134,7 +134,6 @@ public class ShareRecipeFragment extends Fragment implements GoogleApiClient.Con
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         // Need to connect to the GoogleApiService.
         buildGoogleApiClient();
 
