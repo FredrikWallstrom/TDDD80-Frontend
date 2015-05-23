@@ -37,7 +37,7 @@ import com.example.frewa814.livekrubb.recipe.ShowRecipeFragment;
 import com.example.frewa814.livekrubb.flow.MyPageFragment;
 import com.example.frewa814.livekrubb.misc.OnButtonClickedListener;
 import com.example.frewa814.livekrubb.recipe.RecipeBankFragment;
-import com.example.frewa814.livekrubb.recipe.TopListFragment;
+import com.example.frewa814.livekrubb.recipe.ToplistFragment;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -463,8 +463,8 @@ public class MainActivity extends Activity implements OnButtonClickedListener {
             // Case topList button in the RecipeBankFragment.
             // Change to the TopListFragment.
             case R.id.toplist_button:
-                TopListFragment topListFragment = new TopListFragment();
-                ft.replace(R.id.fragment_container, topListFragment);
+                ToplistFragment toplistFragment = new ToplistFragment();
+                ft.replace(R.id.fragment_container, toplistFragment);
                 ft.commit();
                 break;
 
