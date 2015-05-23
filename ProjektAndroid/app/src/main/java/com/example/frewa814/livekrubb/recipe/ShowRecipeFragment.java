@@ -144,8 +144,8 @@ public class ShowRecipeFragment extends Fragment {
                     } else {
                         mLikeButton.setText("Unlike");
                     }
+                    updateLikeView();
                 }
-                updateLikeView();
             }
             // Check if the user clicked on the comment button.
             // In that case, alert the MainActivity to change fragment to commentFragment.
